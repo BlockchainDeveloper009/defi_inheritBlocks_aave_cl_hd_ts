@@ -21,8 +21,6 @@ contract MoneyMarketFactory is ERC1155, ERC1155Holder, Vault {
 
     bool DoesAdminExist;
 
-    bool OneBondinCirculation;
-
     address payable[] public buyers;
 
     // JSON-like structure containing info on each bond
