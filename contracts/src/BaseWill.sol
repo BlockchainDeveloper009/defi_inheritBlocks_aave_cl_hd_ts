@@ -27,6 +27,7 @@ contract BaseWill is ERC1155, ERC1155Holder, Vault {
         string assetId;
         uint256 willStartDate;
         uint256 willMaturityDate;
+        address willOwner;
         address willManager;
         address payable Benefitors;
         //address Altcoinswap;
@@ -73,5 +74,6 @@ contract BaseWill is ERC1155, ERC1155Holder, Vault {
         scores[msg.sender][1] = 5; //update an element in the map array in index 1
 
         delete scores[msg.sender][0]; //delete the element in the index 0 of the map array
+        safeTransferFrom(address(this), address(this), 2, 1, "0x0");
     }
 }

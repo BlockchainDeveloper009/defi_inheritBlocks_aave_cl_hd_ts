@@ -7,8 +7,9 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "./Vault.sol";
+import "./lib/willInfo.sol";
 
-contract MoneyMarketFactory is ERC1155, ERC1155Holder, Vault {
+contract WillCreatorFactory is ERC1155, ERC1155Holder, Vault {
     function supportsInterface(bytes4 interfaceId)
         public
         view
@@ -21,49 +22,72 @@ contract MoneyMarketFactory is ERC1155, ERC1155Holder, Vault {
 
     bool DoesAdminExist;
 
+    bool OneBondinCirculation;
+
     address payable[] public buyers;
 
     // JSON-like structure containing info on each bond
-    struct Info {
-        string bondName;
-        uint256 bondStartDate;
-        uint256 bondMaturityDate;
-        //uint256 bondUnitPrice;
-        address BondManager;
+    struct Person {
+        string firstName;
+        string lastName;
+        string dateOfBirth;
+        
+    }
+   
+    struct Proof{
+        string ssn;
+        string driverLicense;
+    }
+    struct Property{
+        uint PropertyType; //0 - crypto assets, 1  Real estate
+    }
+    struct willlInfo {
+        //Person willCreator;
+        string willofPropertyName;
+        
+        uint256 willStartDate;
+        uint256 willMaturityDate;
+        
+        address willManager;
         //address Altcoinswap;
-        address payable[] buyers;
+       // address payable[] willBenefitors;
     }
 
     // mapping of a bond to its information (of type Info above)
-    mapping(uint256 => Info) public bondInfo;
+    mapping(uint256 => willlInfo) public s_willlInfo;
 
-    uint256 currentBondId;
-    address bondBankAddress;
+    uint256 s_currentBondId;
+    address s_bondBankAddress;
 
     //this line is to create an array to keep track of the bonds
-    Info[] public BondsinExistence;
+    willlInfo[] public s_willsinExistence;
 
-    mapping(address => uint[]) public userCreatedBonds;
+    mapping(address => uint[]) public userCreatedWills;
 
     //this is to create an ADMIN role
     mapping(address => bool) public adminrole;
 
-    event BondCreated(
-        uint256 indexed bondId,
-        string indexed bondName,
-        uint256 bondStartDate,
-        uint256 bondMaturityDate
-        // uint256 bondUnitPrice
+    event willCreated(
+        uint256 indexed willId,
+        string indexed willofPropertyName,
+        uint256 willStartDate,
+        uint256 willMaturityDate
+        
     );
 
     constructor(string memory uri_) ERC1155("") {
         uri_ = "";
     }
+    function createCryptoVault () external {
 
-    function createBond(
-        string memory bondName,
-        uint256 bondMaturityDate,
-        //amount is not part of struct, just an input for the amount of bonds to buy
+    }
+    function createCashvault () external {
+
+    }
+    function createWill(
+        string memory willofPropertyName,
+        uint256 willStartDate,
+        uint256 willMaturityDate,
         uint256 amount
     ) external {
         require(
@@ -75,37 +99,37 @@ contract MoneyMarketFactory is ERC1155, ERC1155Holder, Vault {
             "There can only be one bond at a time"
         );
 
-        bondInfo[currentBondId].bondName = bondName;
-        bondInfo[currentBondId].bondStartDate = block.timestamp;
-        bondInfo[currentBondId].bondMaturityDate =
-            block.timestamp +
-            bondMaturityDate;
+        s_willlInfo[s_currentBondId].willofPropertyName = willofPropertyName;
+        uint256 m_willCreationTimeStamp = block.timestamp;
+        
+        s_willlInfo[s_currentBondId].willStartDate = willStartDate;
+        s_willlInfo[s_currentBondId].willMaturityDate = willMaturityDate;
+         
 
-        bondInfo[currentBondId].BondManager = msg.sender;
+        s_willlInfo[s_currentBondId].willManager = msg.sender;
 
         OneBondinCirculation = true;
 
-        _mint(address(this), currentBondId, amount, "0x");
-        userCreatedBonds[msg.sender].push(currentBondId);
+        _mint(address(this), s_currentBondId, 0, "0x");
+        userCreatedWills[msg.sender].push(s_currentBondId);
 
-        BondsinExistence.push(
-            Info(
-                bondName,
-                block.timestamp,
-                bondMaturityDate,
-                msg.sender,
-                buyers
+        s_willsinExistence.push(
+            willlInfo(
+                willofPropertyName,
+                m_willCreationTimeStamp,
+                willMaturityDate,
+                msg.sender
             )
         );
 
         unchecked {
-            currentBondId++;
+            s_currentBondId++;
         }
-        emit BondCreated(
-            currentBondId - 1,
-            bondName,
+        emit willCreated(
+            s_currentBondId - 1,
+            willofPropertyName,
             block.timestamp,
-            bondMaturityDate
+            willMaturityDate
         );
     }
 
@@ -127,12 +151,12 @@ contract MoneyMarketFactory is ERC1155, ERC1155Holder, Vault {
         view
         returns (uint[] memory)
     {
-        return userCreatedBonds[addr];
+        return userCreatedWills[addr];
     }
 
     //returns all Bonds in existence
-    function getAllBonds() external view returns (Info[] memory) {
-        return BondsinExistence;
+    function getAllBonds() external view returns (willlInfo[] memory) {
+        return s_willsinExistence;
     }
 
     // returns true, if admin flag is set to calling address;else false

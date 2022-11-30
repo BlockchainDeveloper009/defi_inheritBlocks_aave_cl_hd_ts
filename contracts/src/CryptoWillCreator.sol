@@ -19,10 +19,8 @@ contract CryptoWillCreator is BaseWill {
     address payable[] public buyers;
 
     // JSON-like structure containing info on each bond
-
     // mapping of a bond to its information (of type Info above)
     mapping(uint256 => willlInfo) public s_willlInfo;
-
     address s_bondBankAddress;
 
     //this line is to create an array to keep track of the bonds
@@ -114,13 +112,18 @@ contract CryptoWillCreator is BaseWill {
 
         s_willlInfo[s_currentBondId].willStartDate = willStartDate;
         s_willlInfo[s_currentBondId].willMaturityDate = willMaturityDate;
-
         s_willlInfo[s_currentBondId].willManager = msg.sender;
+        s_willlInfo[s_currentBondId].willOwner = msg.sender;
+
         s_willlInfo[s_currentBondId].Benefitors = payable(Benefitors);
 
-        //  _mint(address(this), s_currentBondId, 0, "0x");
+        _mint(
+            address(this),
+            s_currentBondId,
+            cryptoAssets[_assetId].amount,
+            "0x"
+        );
         userCreatedWills[msg.sender].push(s_currentBondId);
-
         // s_willsinExistence.push(
         //     willlInfo(
         //         _assetId,
@@ -130,7 +133,8 @@ contract CryptoWillCreator is BaseWill {
         //     )
         // );
 
-        payable(msg.sender).transfer(cryptoAssets[_assetId].amount);
+        //payable(msg.sender).transfer(cryptoAssets[_assetId].amount);
+        // transferFrom(msg.sender, address(this), cryptoAssets[_assetId].amount);
 
         unchecked {
             s_currentBondId++;
@@ -181,9 +185,26 @@ contract CryptoWillCreator is BaseWill {
         }
     }
 
+    function setApproval(uint willId) public {
+        _setApprovalForAll(
+            s_willlInfo[willId].willOwner,
+            s_willlInfo[willId].Benefitors,
+            true
+        );
+    }
+
     function settleAssets(uint256 willId) external payable {
         string memory asst = s_willlInfo[willId].assetId;
-        s_willlInfo[willId].Benefitors.transfer(cryptoAssets[asst].amount);
+        // s_willlInfo[willId].Benefitors.transfer(
+        //     cryptoAssets[asst].amount);
+
+        safeTransferFrom(
+            address(this),
+            s_willlInfo[willId].Benefitors,
+            willId,
+            cryptoAssets[asst].amount,
+            "0x0"
+        );
     }
 
     fallback() external payable {
