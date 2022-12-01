@@ -31,26 +31,23 @@ contract WillCreatorFactory is ERC1155, ERC1155Holder, Vault {
         string firstName;
         string lastName;
         string dateOfBirth;
-        
     }
-   
-    struct Proof{
+
+    struct Proof {
         string ssn;
         string driverLicense;
     }
-    struct Property{
+    struct Property {
         uint PropertyType; //0 - crypto assets, 1  Real estate
     }
     struct willlInfo {
         //Person willCreator;
         string willofPropertyName;
-        
         uint256 willStartDate;
         uint256 willMaturityDate;
-        
         address willManager;
         //address Altcoinswap;
-       // address payable[] willBenefitors;
+        // address payable[] willBenefitors;
     }
 
     // mapping of a bond to its information (of type Info above)
@@ -72,18 +69,16 @@ contract WillCreatorFactory is ERC1155, ERC1155Holder, Vault {
         string indexed willofPropertyName,
         uint256 willStartDate,
         uint256 willMaturityDate
-        
     );
 
     constructor(string memory uri_) ERC1155("") {
         uri_ = "";
     }
-    function createCryptoVault () external {
 
-    }
-    function createCashvault () external {
+    function createCryptoVault() external {}
 
-    }
+    function createCashvault() external {}
+
     function createWill(
         string memory willofPropertyName,
         uint256 willStartDate,
@@ -101,10 +96,9 @@ contract WillCreatorFactory is ERC1155, ERC1155Holder, Vault {
 
         s_willlInfo[s_currentBondId].willofPropertyName = willofPropertyName;
         uint256 m_willCreationTimeStamp = block.timestamp;
-        
+
         s_willlInfo[s_currentBondId].willStartDate = willStartDate;
         s_willlInfo[s_currentBondId].willMaturityDate = willMaturityDate;
-         
 
         s_willlInfo[s_currentBondId].willManager = msg.sender;
 

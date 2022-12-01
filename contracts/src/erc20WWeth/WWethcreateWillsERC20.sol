@@ -9,9 +9,9 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./Vault.sol";
 import "./lib/willInfo.sol";
-import "./BaseWill.sol";
+import "./WWethBase20.sol";
 
-contract CryptoWillCreator is BaseWill {
+contract CryptoWillCreator is WWethBase20 {
     bool DoesAdminExist;
 
     bool OneBondinCirculation;
@@ -37,10 +37,6 @@ contract CryptoWillCreator is BaseWill {
         uint256 willMaturityDate,
         uint cryptoWillId
     );
-
-    constructor(string memory uri_) BaseWill("") {
-        uri_ = "";
-    }
 
     // function createCashvault () external {
 
@@ -76,8 +72,8 @@ contract CryptoWillCreator is BaseWill {
         return s_arr_cryptoAssetIds;
     }
 
-    function initAssetsAndWills() external {
-        createAsset("t1", 111111111111111111);
+    function init() external {
+        createAsset("t1", 1111111111111111111);
         createAsset("t2", 2222222222);
         createAsset("t3", 33333333333);
         a_createCryptoVault(
@@ -94,12 +90,6 @@ contract CryptoWillCreator is BaseWill {
         );
 
         // createCryptoVault("ca-1", 7, 7,100,["0x17F6AD8Ef982297579C203069C1DbfFE4348c372"]);
-    }
-
-    function initAssets() external {
-        createAsset("t1", 111111111111111111);
-        createAsset("t2", 2222222222);
-        createAsset("t3", 33333333333);
     }
 
     function c_getContractBalance() public view returns (uint) {
@@ -168,10 +158,10 @@ contract CryptoWillCreator is BaseWill {
     //this function is to initialize the admin role. This will provide the devs with funds
     function addADMINrole() external payable {
         // require (msg.value == 0 ether, " please send .001 ether");
-        // require(
-        //     DoesAdminExist == false,
-        //     "Only one Admin is allowed to issue bonds"
-        // );
+        require(
+            DoesAdminExist == false,
+            "Only one Admin is allowed to issue bonds"
+        );
 
         adminrole[msg.sender] = true;
         DoesAdminExist = true;
