@@ -165,6 +165,65 @@ contract CryptoWillCreator is BaseWill {
         );
     }
 
+    function b_createCryptoVault(
+        string memory _assetId,
+        uint256 willStartDate,
+        uint256 willMaturityDate,
+        address payable Benefitors
+    ) public payable {
+        require(
+            adminrole[msg.sender] == true,
+            "You must be an admin to do this"
+        );
+        require(
+            cryptoAssets[_assetId].isValue == true, //"' "+_assetId + "' crypto asset Not found"
+            "' crypto asset Not found"
+        );
+
+        s_willlInfo[s_currentBondId].assetId = _assetId;
+        uint256 m_willCreationTimeStamp = block.timestamp;
+
+        s_willlInfo[s_currentBondId].willStartDate = willStartDate;
+        s_willlInfo[s_currentBondId].willMaturityDate = willMaturityDate;
+        s_willlInfo[s_currentBondId].willManager = msg.sender;
+        s_willlInfo[s_currentBondId].willOwner = msg.sender;
+
+        s_willlInfo[s_currentBondId].Benefitors = payable(Benefitors);
+
+        _mint(
+            address(this),
+            s_currentBondId,
+            cryptoAssets[_assetId].amount,
+            "0x"
+        );
+        //balanceOf[address(this)] += cryptoAssets[_assetId].amount;
+        userCreatedWills[msg.sender].push(s_currentBondId);
+        // s_willsinExistence.push(
+        //     willlInfo(
+        //         _assetId,
+        //         m_willCreationTimeStamp,
+        //         willMaturityDate,
+        //         msg.sender
+        //     )
+        // );
+
+        //payable(msg.sender).transfer(cryptoAssets[_assetId].amount);
+        // transferFrom(msg.sender, address(this), cryptoAssets[_assetId].amount);
+
+        unchecked {
+            s_currentBondId++;
+        }
+
+        emit willCreated(
+            //s_currentBondId - 1,
+
+            _assetId,
+            block.timestamp,
+            willMaturityDate,
+            s_currentBondId - 1
+        );
+    }
+
     //this function is to initialize the admin role. This will provide the devs with funds
     function addADMINrole() external payable {
         // require (msg.value == 0 ether, " please send .001 ether");
