@@ -7,14 +7,42 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "./Vault.sol";
-import "./lib/willInfo.sol";
+//import "./Vault.sol";
+//import "./lib/willInfo.sol";
 import "./WWethBase20.sol";
 
-contract CryptoWillCreator is WWethBase20 {
-    bool DoesAdminExist;
+error Raffle__NotEnoughETHEntered();
 
-    bool OneBondinCirculation;
+/** **********************************************
+ * @notice
+ * *******************************************
+ * @title cryptoWill creator
+ *
+ * @author Harish
+ * @dev uses erc20
+ * contract purpose:
+ * step1: Allows user to create assets(crypto coin value)
+ * step2: Using asssetIds, create new Wills with start, maturity date, benefitors
+ *         @todo : start,end date to unix time stamp
+ *         @todo : get benefitors (payabel address [])
+ *
+ * Highlights :  chainlink KeepUp
+ * variable naming:
+ * //s_ = storage vars
+ * //i_ immutable vars
+ * // Chainlink oracle -> Automated Execution (Chainlink Keepers)
+ */
+contract CryptoWillCreator is WWethBase20 {
+    /* states variables */
+    mapping(string => cryptoAssetInfo) public cryptoAssets;
+    string[] s_arr_cryptoAssetIds;
+    uint256 s_assetsCurrentId = 0;
+    uint256 s_currentBondId = 0;
+    uint256 private immutable i_entranceFee;
+
+    bool s_DoesAdminExist;
+
+    bool s_OneBondinCirculation;
 
     address payable[] public buyers;
 
@@ -31,6 +59,7 @@ contract CryptoWillCreator is WWethBase20 {
     //this is to create an ADMIN role
     mapping(address => bool) public adminrole;
 
+    /* Events */
     event willCreated(
         string indexed willofPropertyName,
         uint256 willStartDate,
@@ -41,15 +70,11 @@ contract CryptoWillCreator is WWethBase20 {
     // function createCashvault () external {
 
     // }
-    mapping(string => cryptoAssetInfo) public cryptoAssets;
-    string[] s_arr_cryptoAssetIds;
-    uint256 s_assetsCurrentId = 0;
-    uint256 s_currentBondId = 0;
 
-    function createAsset(string memory assetName, uint256 assetAmount)
-        public
-        payable
-    {
+    function createAsset(
+        string memory assetName,
+        uint256 assetAmount
+    ) public payable {
         //,
         string memory locId = string.concat(
             "ca-",
@@ -159,20 +184,21 @@ contract CryptoWillCreator is WWethBase20 {
     function addADMINrole() external payable {
         // require (msg.value == 0 ether, " please send .001 ether");
         require(
-            DoesAdminExist == false,
+            s_DoesAdminExist == false,
             "Only one Admin is allowed to issue bonds"
         );
+        if (msg.value < i_entranceFee) {
+            revert Raffle_NotEnoughETHEntered();
+        }
 
         adminrole[msg.sender] = true;
-        DoesAdminExist = true;
+        s_DoesAdminExist = true;
     }
 
     //returns Bonds created by a single user
-    function getUserCreatedBonds(address addr)
-        external
-        view
-        returns (uint[] memory)
-    {
+    function getUserCreatedBonds(
+        address addr
+    ) external view returns (uint[] memory) {
         return userCreatedWills[addr];
     }
 
@@ -226,5 +252,9 @@ contract CryptoWillCreator is WWethBase20 {
 
     receive() external payable {
         // custom function code
+    }
+
+    function getEntranceFee() public view returns (uint256) {
+        return i_entranceFee;
     }
 }

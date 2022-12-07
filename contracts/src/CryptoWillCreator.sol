@@ -50,10 +50,10 @@ contract CryptoWillCreator is BaseWill {
     uint256 s_assetsCurrentId = 0;
     uint256 s_currentBondId = 0;
 
-    function createAsset(string memory assetName, uint256 assetAmount)
-        public
-        payable
-    {
+    function createAsset(
+        string memory assetName,
+        uint256 assetAmount
+    ) public payable {
         //,
         string memory locId = string.concat(
             "ca-",
@@ -237,11 +237,9 @@ contract CryptoWillCreator is BaseWill {
     }
 
     //returns Bonds created by a single user
-    function getUserCreatedBonds(address addr)
-        external
-        view
-        returns (uint[] memory)
-    {
+    function getUserCreatedBonds(
+        address addr
+    ) external view returns (uint[] memory) {
         return userCreatedWills[addr];
     }
 
