@@ -158,7 +158,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         userCreatedWills[msg.sender].push(s_currentBondId);
         uint dateHash = generateHash(willMaturityDate);
         s_WillsByMaturityDate[dateHash].push(s_currentBondId);
-
+        s_maturityDates.push(dateHash);
         // s_willsinExistence.push(
         //     willlInfo(
         //         _assetId,
@@ -255,12 +255,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     }
 
     function generateHash(uint matDate) public returns (uint) {
-        return
-            uint(
-                keccak256(
-                    abi.encodePacked(block.difficulty, block.timestamp, matDate)
-                )
-            );
+        return uint(keccak256(abi.encodePacked(matDate)));
     }
     // function performUpKeep(
     //     bytes calldata
