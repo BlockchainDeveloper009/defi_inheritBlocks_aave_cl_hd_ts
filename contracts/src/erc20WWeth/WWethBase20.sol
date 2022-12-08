@@ -7,9 +7,10 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "./WWeth20.sol";
-import "./lib/willInfo.sol";
 
-contract WWethBase20 {
+//import "./lib/willInfo.sol";
+
+contract WWethBase20 is WWeth20 {
     struct Person {
         string firstName;
         string lastName;

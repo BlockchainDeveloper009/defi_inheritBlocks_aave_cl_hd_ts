@@ -7,24 +7,24 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AutomationCompatibleInterface.sol";
 //import "./Vault.sol";
 //import "./lib/willInfo.sol";
 import "./WWethBase20.sol";
-
-error Raffle__NotEnoughETHEntered();
+import "hardhat/console.sol";
 
 /** **********************************************
  * @notice
  * *******************************************
- * @title cryptoWill creator
+ * title cryptoWill creator
  *
- * @author Harish
+ * author Harish
  * @dev uses erc20
  * contract purpose:
  * step1: Allows user to create assets(crypto coin value)
  * step2: Using asssetIds, create new Wills with start, maturity date, benefitors
- *         @todo : start,end date to unix time stamp
- *         @todo : get benefitors (payabel address [])
+ *         todo : start,end date to unix time stamp
+ *         todo : get benefitors (payabel address [])
  *
  * Highlights :  chainlink KeepUp
  * variable naming:
@@ -32,19 +32,21 @@ error Raffle__NotEnoughETHEntered();
  * //i_ immutable vars
  * // Chainlink oracle -> Automated Execution (Chainlink Keepers)
  */
-contract CryptoWillCreator is WWethBase20 {
+//error Raffle__UpkeepNotNeeded1(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
+
+contract WWethcreateWillsERC20 is WWethBase20 {
+    error Raffle__NotEnoughETHEntered();
+    error Raffle__UpkeepNotNeeded();
     /* states variables */
     mapping(string => cryptoAssetInfo) public cryptoAssets;
     string[] s_arr_cryptoAssetIds;
     uint256 s_assetsCurrentId = 0;
     uint256 s_currentBondId = 0;
-    uint256 private immutable i_entranceFee;
+    uint256 private immutable i_entranceFee = 1;
 
     bool s_DoesAdminExist;
 
     bool s_OneBondinCirculation;
-
-    address payable[] public buyers;
 
     // JSON-like structure containing info on each bond
     // mapping of a bond to its information (of type Info above)
@@ -55,7 +57,8 @@ contract CryptoWillCreator is WWethBase20 {
     willlInfo[] public s_willsinExistence;
 
     mapping(address => uint[]) public userCreatedWills;
-
+    mapping(uint => uint[]) public s_WillsByMaturityDate;
+    uint[] public s_maturityDates;
     //this is to create an ADMIN role
     mapping(address => bool) public adminrole;
 
@@ -110,7 +113,7 @@ contract CryptoWillCreator is WWethBase20 {
         a_createCryptoVault(
             "ca-1",
             55,
-            23,
+            20221220,
             payable(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2)
         );
 
@@ -148,12 +151,14 @@ contract CryptoWillCreator is WWethBase20 {
 
         _mint(
             address(this),
-            s_currentBondId,
-            cryptoAssets[_assetId].amount,
-            "0x"
+            //s_currentBondId,
+            cryptoAssets[_assetId].amount
         );
-        balanceOf[address(this)] += cryptoAssets[_assetId].amount;
+
         userCreatedWills[msg.sender].push(s_currentBondId);
+        uint dateHash = generateHash(willMaturityDate);
+        s_WillsByMaturityDate[dateHash].push(s_currentBondId);
+
         // s_willsinExistence.push(
         //     willlInfo(
         //         _assetId,
@@ -178,6 +183,7 @@ contract CryptoWillCreator is WWethBase20 {
             willMaturityDate,
             s_currentBondId - 1
         );
+        // @todo implement maturity date based wills
     }
 
     //this function is to initialize the admin role. This will provide the devs with funds
@@ -188,7 +194,7 @@ contract CryptoWillCreator is WWethBase20 {
             "Only one Admin is allowed to issue bonds"
         );
         if (msg.value < i_entranceFee) {
-            revert Raffle_NotEnoughETHEntered();
+            revert Raffle__NotEnoughETHEntered();
         }
 
         adminrole[msg.sender] = true;
@@ -216,22 +222,8 @@ contract CryptoWillCreator is WWethBase20 {
         }
     }
 
-    function setApprovalbyOwner(uint willId) public {
-        _setApprovalForAll(
-            s_willlInfo[willId].willOwner,
-            s_willlInfo[willId].Benefitors,
-            true
-        );
-    }
-
-    function setApprovalbyContract(uint willId) public {
-        // _setApprovalForAll(address(this), s_willlInfo[willId].Benefitors, true);
-        _setApprovalForAll(s_willlInfo[willId].willOwner, address(this), true);
-        //
-    }
-
     //0x1c91347f2A44538ce62453BEBd9Aa907C662b4bD
-    function settleAssets(uint256 willId) external payable {
+    function settleAssets(uint256 willId) public payable {
         string memory asst = s_willlInfo[willId].assetId;
         // s_willlInfo[willId].Benefitors.transfer(
         //     cryptoAssets[asst].amount);
@@ -246,15 +238,101 @@ contract CryptoWillCreator is WWethBase20 {
     //0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
     //0x540d7E428D5207B30EE03F2551Cbb5751D3c7569
 
-    fallback() external payable {
-        // custom function code
-    }
+    // fallback() external override payable {
+    //     // custom function code
+    // }
 
-    receive() external payable {
-        // custom function code
-    }
+    // receive() external overpayable {
+    //     // custom function code
+    // }
 
     function getEntranceFee() public view returns (uint256) {
         return i_entranceFee;
     }
+
+    function getMaturityDates() public view returns (uint[] memory) {
+        return s_maturityDates;
+    }
+
+    function generateHash(uint matDate) public returns (uint) {
+        return
+            uint(
+                keccak256(
+                    abi.encodePacked(block.difficulty, block.timestamp, matDate)
+                )
+            );
+    }
+    // function performUpKeep(
+    //     bytes calldata
+    // ) external override {
+    //     (bool upKeepNeeded,) = checkUpKeep("");
+    //     if(!upKeepNeeded) {
+    //         revert Raffle__UpkeepNotNeeded(
+    //             // address(this).balance,
+    //             // s_players.length,
+    //             // uint256(s_raffleState)
+
+    //         );
+    //     }
+    // }
+    // function checkUpKeep(
+    //     bytes memory /*checkData */
+    // )
+    // public
+    // view
+    // override
+    // returns (
+    //     bool upkeepNeeded,
+    //     bytes memory /* performData*/
+    // ){
+    //     // bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
+    //    settleAssets(1);
+    //    upkeepNeeded = false;
+    //    return (upkeepNeeded, "0x0");
+    // }
+    // function checkUpkeep(
+    //     bytes memory /* checkData */
+    // )
+    //     public
+    //     view
+    //     override
+    //     returns (
+    //         bool upkeepNeeded,
+    //         bytes memory /* performData */
+    //     )
+    // {
+    //     // bool isOpen = RaffleState.OPEN == s_raffleState;
+    //     // bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
+    //     // bool hasPlayers = s_players.length > 0;
+    //     // bool hasBalance = address(this).balance > 0;
+    //     // upkeepNeeded = (timePassed && isOpen && hasBalance && hasPlayers);
+    //     return (upkeepNeeded, "0x0"); // can we comment this out?
+    // }
+    //  /**
+    //  * @dev Once `checkUpkeep` is returning `true`, this function is called
+    //  * and it kicks off a Chainlink VRF call to get a random winner.
+    //  */
+    // function performUpkeep(
+    //     bytes calldata /* performData */
+    // ) external override {
+    //     (bool upkeepNeeded, ) = checkUpkeep("");
+    //     // require(upkeepNeeded, "Upkeep not needed");
+    //     // if (!upkeepNeeded) {
+    //     //     revert Raffle__UpkeepNotNeeded(
+    //     //         address(this).balance,
+    //     //         s_players.length,
+    //     //         uint256(s_raffleState)
+    //     //     );
+    //     // }
+    //     // s_raffleState = RaffleState.CALCULATING;
+    //     // uint256 requestId = i_vrfCoordinator.requestRandomWords(
+    //     //     i_gasLane,
+    //     //     i_subscriptionId,
+    //     //     REQUEST_CONFIRMATIONS,
+    //     //     i_callbackGasLimit,
+    //     //     NUM_WORDS
+    //     // );
+    //     // // Quiz... is this redundant?
+    //     // emit RequestedRaffleWinner(requestId);
+    // }
 }
