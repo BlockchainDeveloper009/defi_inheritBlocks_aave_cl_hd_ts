@@ -1,7 +1,7 @@
-import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
-import { expect } from "chai";
-import { ethers } from "hardhat";
+const { time, loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
+const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
+const { expect } = require("chai");
+const { ethers } = require("hardhat");
 //hh test --grep "picks a winner"
 //hardhat run test --grep "picks a winner"
 describe("Lock", function () {
@@ -18,11 +18,11 @@ describe("Lock", function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount, thirdAcct] = await ethers.getSigners();
     const contracts = [
-      "../../../contracts/src/erc20WWeth/WWethcreateWillsERC20", 
-      ""
-      ];
-
-    const Lock = await ethers.getContractFactory(contracts[0]);
+      "./artifacts/contracts/src/erc20WWeth/WWethcreateWillsERC20", 
+      "../../../artifacts/contracts/src/erc20WWeth/WWethcreateWillsERC20",
+      "WWethcreateWillsERC20"];
+      //const Lock1 = await ethers.getContractFactory(contracts[2]);
+    const Lock = await ethers.getContractFactory(contracts[2]);
     const lock = await Lock.deploy();
     lock.init();
 
@@ -39,7 +39,28 @@ describe("Lock", function () {
         console.log(`lockedAmount - ${lockedAmount}`);
         console.log(`otherAccount - ${otherAccount}`);
         console.log(`thirdAcct - ${thirdAcct}`);
+        const startDatestr = new Date('YYYY-MM-DD');
+        const startDatestr_timestampInSeconds = Math.floor(startDatestr.getTime() / 1000);
 
+        const dateStr = '2023-12-27';
+
+        const date = new Date(dateStr);
+
+        // // 👇️ timestamp in milliseconds
+        // const timestampInMs = date.getTime();
+
+        // 👇️ timestamp in seconds (Unix timestamp)
+        const timestampInSeconds = Math.floor(date.getTime() / 1000);
+        console.log(timestampInSeconds);
+        const ONE_GWEI = 1_000_000_000;
+        //web3.eth.abi.decodeParameters(typesArray, hexString)
+        
+        lock.addADMINrole({value:lockedAmount});
+        lock.a_createCryptoVault(
+          "ca-0",
+          startDatestr_timestampInSeconds,
+          timestampInSeconds,
+          "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
         // await time.increaseTo(unlockTime);
 
         // await expect(lock.withdraw())
@@ -132,7 +153,7 @@ describe("Lock", function () {
   //   });
 
     describe("checkUpKeep", function () {
-      it("returns falsei f people havent", async function () {
+      it("returns false if people havent", async function () {
 
       
 
