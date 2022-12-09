@@ -105,9 +105,13 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     }
 
     function init() external {
-        createAsset("t1", 1111111111111111111);
-        createAsset("t2", 2222222222);
-        createAsset("t3", 33333333333);
+        uint256 amt1 = 1 * 10 * 18;
+        uint256 amt2 = 2 * 10 * 18;
+        uint256 amt3 = 3 * 10 * 18;
+
+        createAsset("t1", amt1);
+        createAsset("t2", amt2);
+        createAsset("t3", amt3);
 
         // createCryptoVault("ca-1", 7, 7,100,["0x17F6AD8Ef982297579C203069C1DbfFE4348c372"]);
     }
