@@ -1,17 +1,18 @@
-import { ethers } from "hardhat";
-import { HardhatConfig, HardhatUserConfig } from "hardhat/types";
+const {ethers} = require("hardhat");
+const { HardhatConfig, HardhatUserConfig } = require("hardhat/types");
 
-import { extendConfig, extendEnvironment } from "hardhat/config";
+const { extendConfig, extendEnvironment } = require("hardhat/config");
 
 async function main(hre) {
   const currentTimestampInSeconds = Math.round(Date.now() / 1000);
   const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
   const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  //const lockedAmount = ethers.utils.parseEther("1");
 
   const Lock = await ethers.getContractFactory("WWethcreateWillsERC20");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  //const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  const lock = await Lock.deploy();
 
   await lock.deployed();
 

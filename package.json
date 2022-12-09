@@ -17,7 +17,12 @@
     "url": "https://github.com/BlockchainDeveloper009/defi_inheritBlocks_aave_cl_hd_ts/issues"
   },
   "homepage": "https://github.com/BlockchainDeveloper009/defi_inheritBlocks_aave_cl_hd_ts#readme",
-  "dependencies": {},
+  "dependencies": {
+    "@chainlink/contracts": "^0.5.1",
+    "@nomicfoundation/solidity-analyzer-win32-x64-msvc": "^0.1.0",
+    "@openzeppelin/contracts": "^4.8.0",
+    "dotenv": "^16.0.3"
+  },
   "devDependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
@@ -32,10 +37,15 @@
     "@types/mocha": "^9.1.0",
     "@types/node": "^18.11.9",
     "chai": "^4.2.0",
-    "ethers": "^5.4.7",
+    "ethers": "^5.7.2",
+    "fs-extra": "^10.1.0",
     "hardhat": "^2.11.1",
+    "hardhat-deploy": "^0.11.20",
     "hardhat-gas-reporter": "^1.0.8",
-    "solidity-coverage": "^0.8.0",
+    "prettier": "^2.7.1",
+    "prettier-plugin-solidity": "^1.0.0-rc.1",
+    "solhint": "^3.3.7",
+    "solidity-coverage": "^0.8.1",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.0",
     "typescript": "^4.9.3"
