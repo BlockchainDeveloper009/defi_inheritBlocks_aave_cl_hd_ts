@@ -31,6 +31,10 @@ import "hardhat/console.sol";
  * //s_ = storage vars
  * //i_ immutable vars
  * // Chainlink oracle -> Automated Execution (Chainlink Keepers)
+ * dec/09/2022 - add require statements to all methods
+ * - burn the old will after hitting settle
+ * - find out why contract doesnt get credited
+ * - create new ds to fetch wills by maturity date either struct or new mapping + array combination
  */
 //error Raffle__UpkeepNotNeeded1(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
 
@@ -104,20 +108,26 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         createAsset("t1", 1111111111111111111);
         createAsset("t2", 2222222222);
         createAsset("t3", 33333333333);
+
+        // createCryptoVault("ca-1", 7, 7,100,["0x17F6AD8Ef982297579C203069C1DbfFE4348c372"]);
+    }
+
+    function createTxn_zero() external {
         a_createCryptoVault(
             "ca-0",
-            45,
-            50,
-            payable(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2)
-        );
-        a_createCryptoVault(
-            "ca-1",
-            55,
+            20221210,
             20221220,
             payable(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2)
         );
+    }
 
-        // createCryptoVault("ca-1", 7, 7,100,["0x17F6AD8Ef982297579C203069C1DbfFE4348c372"]);
+    function createTxn_one() external {
+        a_createCryptoVault(
+            "ca-1",
+            20221210,
+            20221220,
+            payable(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2)
+        );
     }
 
     function c_getContractBalance() public view returns (uint) {
