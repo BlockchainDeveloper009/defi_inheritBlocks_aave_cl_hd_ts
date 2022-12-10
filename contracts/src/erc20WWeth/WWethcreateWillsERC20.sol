@@ -35,6 +35,7 @@ import "hardhat/console.sol";
  * - burn the old will after hitting settle
  * - find out why contract doesnt get credited
  * - create new ds to fetch wills by maturity date either struct or new mapping + array combination
+ * - Access control: https://docs.openzeppelin.com/contracts/3.x/extending-contracts#using-hooks
  */
 //error Raffle__UpkeepNotNeeded1(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
 
@@ -60,9 +61,10 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     //this line is to create an array to keep track of the bonds
     willlInfo[] public s_willsinExistence;
 
-    mapping(address => uint[]) public userCreatedWills;
+    mapping(address => willlInfo[]) public userCreatedWills;
     mapping(uint => uint[]) public s_WillsByMaturityDate;
-    uint[] public s_maturityDates;
+    mapping(uint => uint) public s_MaturityDates;
+
     //this is to create an ADMIN role
     mapping(address => bool) public adminrole;
 
@@ -169,10 +171,11 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             cryptoAssets[_assetId].amount
         );
 
-        userCreatedWills[msg.sender].push(s_currentBondId);
+        userCreatedWills[msg.sender].push(s_willlInfo);
         uint dateHash = generateHash(willMaturityDate);
-        s_WillsByMaturityDate[dateHash].push(s_currentBondId);
-        s_maturityDates.push(dateHash);
+        s_WillsByMaturityDate[willMaturityDate].push(s_currentBondId);
+        //s_maturityDates.push(s_willlInfo);
+        s_MaturityDates[willMaturityDate]++;
         // s_willsinExistence.push(
         //     willlInfo(
         //         _assetId,
@@ -264,8 +267,19 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         return i_entranceFee;
     }
 
-    function getMaturityDates() public view returns (uint[] memory) {
-        return s_maturityDates;
+    function getMaturityDates() {}
+
+    function getWillsByMaturityDates()
+        public
+        view
+        returns (willlInfo[] memory)
+    {
+        // willlInfo[] memory loc;
+        // for(uint i=0;i<s_maturityDates.length;i++)
+        // {
+        //     loc.push(s_maturityDates[i])
+        // }
+        // return ;
     }
 
     function generateHash(uint matDate) public returns (uint) {

@@ -2,6 +2,15 @@ const { time, loadFixture } = require("@nomicfoundation/hardhat-network-helpers"
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+let debugMode = true;
+//https://ethereum.stackexchange.com/questions/52913/how-can-i-get-the-data-returned-from-solidity-function-from-transaction-id-in-we
+function printToConsole(str)
+{ if(debugMode)
+  {
+    console.log(str);
+  }
+  
+}
 //hh test --grep "picks a winner"
 //hardhat run test --grep "picks a winner"
 describe("Lock", function () {
@@ -21,10 +30,10 @@ describe("Lock", function () {
       "./artifacts/contracts/src/erc20WWeth/WWethcreateWillsERC20", 
       "../../../artifacts/contracts/src/erc20WWeth/WWethcreateWillsERC20",
       "WWethcreateWillsERC20"];
-      //const Lock1 = await ethers.getContractFactory(contracts[2]);
+      
     const Lock = await ethers.getContractFactory(contracts[2]);
     const lock = await Lock.deploy();
-    lock.init();
+    
 
     return { lock, unlockTime, lockedAmount, owner, otherAccount, thirdAcct };
   }
@@ -54,19 +63,42 @@ describe("Lock", function () {
         console.log(timestampInSeconds);
         const ONE_GWEI = 1_000_000_000;
         //web3.eth.abi.decodeParameters(typesArray, hexString)
+      //  await lock.addADMINrole(); 
+        await lock.addADMINrole({value:lockedAmount});
+        let allAssets = await lock.getAllAsset();
         
-        lock.addADMINrole({value:lockedAmount});
-        lock.a_createCryptoVault(
-          "ca-0",
-          startDatestr_timestampInSeconds,
-          timestampInSeconds,
-          "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
+        printToConsole('....allAssets before change.......')
+        printToConsole(allAssets)
+        
+        await lock.init();
+        let allAssets2 = await lock.getAllAsset();
+        printToConsole(`allAssets2 after-- ${allAssets2}`)
+        printToConsole('---')
+        printToConsole(allAssets2)
+        
+        // const event = String.toString(await lock.a_createCryptoVault(
+        //   "ca-0",
+        //   startDatestr_timestampInSeconds,
+        //   timestampInSeconds,
+        //   "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2"));
+        //   printToConsole("event expected");
+        //   printToConsole(event)
         // await time.increaseTo(unlockTime);
 
         // await expect(lock.withdraw())
         //   .to.emit(lock, "Withdrawal")
         //   .withArgs(lockedAmount, anyValue); // We accept any value as `when` arg
       });
+
+
+      it("get all Wills", async function () {
+        const { lock, unlockTime, lockedAmount,  owner, otherAccount, thirdAcct } = await loadFixture(
+          deployOneYearLockFixture
+        );
+
+        printToConsole(await lock.getAllBonds());
+
+      
     });
 
   // describe("Deployment", function () {
@@ -155,26 +187,26 @@ describe("Lock", function () {
     describe("checkUpKeep", function () {
       it("returns false if people havent", async function () {
 
-      
+      //
 
         const { lock, unlockTime, lockedAmount, owner } = await loadFixture(
           deployOneYearLockFixture
         );
 
-          await network.provider.send("evm_increaseTime");
-          //to send transaction, because checkUpKeep method is with 'public' keyword
-          //  ------   await lock.checkUpkeep([])
+        //   await network.provider.send("evm_increaseTime");
+        //   //to send transaction, because checkUpKeep method is with 'public' keyword
+        //   //  ------   await lock.checkUpkeep([])
 
-          //to memic above line and not send txn, call the method as shown below
-          const { upkeepNeeded } = await lock.callStatic.checkUpkeep([])
-          assert(!upkeepNeeded);
+        //   //to memic above line and not send txn, call the method as shown below
+        //   const { upkeepNeeded } = await lock.callStatic.checkUpkeep([])
+        //   assert(!upkeepNeeded);
 
-        await time.increaseTo(unlockTime);
+        // await time.increaseTo(unlockTime);
 
-        await expect(lock.withdraw()).to.changeEtherBalances(
-          [owner, lock],
-          [lockedAmount, -lockedAmount]
-        );
+        // await expect(lock.withdraw()).to.changeEtherBalances(
+        //   [owner, lock],
+        //   [lockedAmount, -lockedAmount]
+        // );
 
 
       });
