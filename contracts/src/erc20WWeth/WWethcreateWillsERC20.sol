@@ -67,7 +67,12 @@ contract WWethcreateWillsERC20 is WWethBase20 {
 
     //this is to create an ADMIN role
     mapping(address => bool) public adminrole;
-
+    enum Status {
+        Created,
+        Started,
+        Matured,
+        Settled
+    }
     /* Events */
     event willCreated(
         string indexed willofPropertyName,
@@ -75,6 +80,13 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         uint256 willMaturityDate,
         uint cryptoWillId
     );
+    event willSettled(
+        uint indexed cryptoWillId,
+        address indexed benefitor,
+        uint256 willMaturityDate,
+        uint256 willAmount
+    );
+
     struct willsByMaturitydates {
         uint maturityDate;
         uint willId;
@@ -97,6 +109,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         cryptoAssets[locId].AssetId = locId;
         cryptoAssets[locId].Name = assetName;
         cryptoAssets[locId].amount = assetAmount;
+
         cryptoAssets[locId].isValue = true;
         s_assetsCurrentId++;
     }
@@ -118,7 +131,9 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         createAsset("t1", amt1);
         createAsset("t2", amt2);
         createAsset("t3", amt3);
+        uint256 amt4 = 3 * 10 * 1;
 
+        createAsset("t4", amt4);
         // createCryptoVault("ca-1", 7, 7,100,["0x17F6AD8Ef982297579C203069C1DbfFE4348c372"]);
     }
 
@@ -137,6 +152,15 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             20221210,
             20221220,
             payable(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2)
+        );
+    }
+
+    function createTxn_Metamask() external payable {
+        a_createCryptoVault(
+            "ca-3",
+            20221210,
+            20221220,
+            payable(0xf821142CC270dAb63767cFAae15dC36D1b043348)
         );
     }
 
@@ -166,15 +190,15 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         s_willlInfo[s_currentBondId].willMaturityDate = willMaturityDate;
         s_willlInfo[s_currentBondId].willManager = msg.sender;
         s_willlInfo[s_currentBondId].willOwner = msg.sender;
-
+        s_willlInfo[s_currentBondId].s_baseStatus = baseStatus.Started;
         s_willlInfo[s_currentBondId].Benefitors = payable(Benefitors);
+        cryptoAssets[_assetId].isValue = false;
 
         _mint(
             address(this),
             //s_currentBondId,
             cryptoAssets[_assetId].amount
         );
-
         userCreatedWills[msg.sender].push(s_willlInfo[s_currentBondId]);
         uint dateHash = generateHash(willMaturityDate);
         s_WillsByMaturityDate[willMaturityDate].push(s_currentBondId);
@@ -197,10 +221,8 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         }
 
         emit willCreated(
-            //s_currentBondId - 1,
-
             _assetId,
-            block.timestamp,
+            willStartDate,
             willMaturityDate,
             s_currentBondId - 1
         );
@@ -214,9 +236,9 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             s_DoesAdminExist == false,
             "Only one Admin is allowed to issue bonds"
         );
-        if (msg.value < i_entranceFee) {
-            revert Raffle__NotEnoughETHEntered();
-        }
+        // if (msg.value < i_entranceFee) {
+        //     revert Raffle__NotEnoughETHEntered();
+        // }
 
         adminrole[msg.sender] = true;
         s_DoesAdminExist = true;
@@ -246,6 +268,10 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     //0x1c91347f2A44538ce62453BEBd9Aa907C662b4bD
     function settleAssets(uint256 willId) public payable {
         string memory asst = s_willlInfo[willId].assetId;
+        require(
+            s_willlInfo[willId].s_baseStatus == baseStatus.Started,
+            "Will not in Start Status"
+        );
         // s_willlInfo[willId].Benefitors.transfer(
         //     cryptoAssets[asst].amount);
 
@@ -253,6 +279,28 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         payable(s_willlInfo[willId].Benefitors).transfer(
             cryptoAssets[asst].amount
         );
+        s_willlInfo[willId].s_baseStatus = baseStatus.Settled;
+        emit willSettled(
+            willId,
+            s_willlInfo[willId].Benefitors,
+            s_willlInfo[willId].willMaturityDate,
+            cryptoAssets[asst].amount
+        );
+    }
+
+    function getWillStatus(uint willId) public view returns (string memory) {
+        if (s_willlInfo[willId].s_baseStatus == baseStatus.Created) {
+            return "Created";
+        }
+        if (s_willlInfo[willId].s_baseStatus == baseStatus.Started) {
+            return "Started";
+        }
+        if (s_willlInfo[willId].s_baseStatus == baseStatus.Matured) {
+            return "Matured";
+        }
+        if (s_willlInfo[willId].s_baseStatus == baseStatus.Settled) {
+            return "Settled"; //Started, Matured, Settled
+        }
     }
 
     //0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
@@ -297,6 +345,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     function generateHash(uint matDate) public returns (uint) {
         return uint(keccak256(abi.encodePacked(matDate)));
     }
+
     // function performUpKeep(
     //     bytes calldata
     // ) external override {
@@ -370,4 +419,6 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     //     // // Quiz... is this redundant?
     //     // emit RequestedRaffleWinner(requestId);
     // }
+
+    function receive() external {}
 }

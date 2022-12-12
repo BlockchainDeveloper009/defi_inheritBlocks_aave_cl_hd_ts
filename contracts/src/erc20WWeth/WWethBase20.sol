@@ -23,6 +23,12 @@ contract WWethBase20 is WWeth20 {
     struct Property {
         uint PropertyType; //0 - crypto assets, 1  Real estate
     }
+    enum baseStatus {
+        Created,
+        Started,
+        Matured,
+        Settled
+    }
     struct willlInfo {
         //Person willCreator;
         string assetId;
@@ -31,6 +37,7 @@ contract WWethBase20 is WWeth20 {
         address willOwner;
         address willManager;
         address payable Benefitors;
+        baseStatus s_baseStatus;
         //address Altcoinswap;
         // address payable[] willBenefitors;
     }

@@ -111,13 +111,19 @@ describe("Lock", function () {
       const { lock, unlockTime, lockedAmount,  owner, otherAccount, thirdAcct } = await loadFixture(
         deployOneYearLockFixture
       );
-
+      const metamaskPolygonHelloWorldTesterAddr = "0xf821142CC270dAb63767cFAae15dC36D1b043348";
+      const willStartDate = 20221210;
+      const willEndDate = 20221220;
       printToConsole(await lock.a_createCryptoVault(
-        "ca-0",
-        20221210,
-        20221220,
-        "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2"
+        "ca-1",
+        willStartDate,
+        willEndDate,
+       metamaskPolygonHelloWorldTesterAddr
+        
       ));
+      //check for event
+      const { userCreatedBonds } = await lock.getUserCreatedBonds();
+      console.log(userCreatedBonds);
     });
 
   // describe("Deployment", function () {
