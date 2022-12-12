@@ -11,6 +11,13 @@ function printToConsole(str)
   }
   
 }
+const meta_benefitorAddr = 0xf821142CC270dAb63767cFAae15dC36D1b043348;
+const meta_txnAsst = "ca-3";
+const hardhat_BenefitorAddr="0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2";
+      
+const willStartDate = 20221210;
+const willEndDate = 20221220;
+
 //hh test --grep "picks a winner"
 //hardhat run test --grep "picks a winner"
 describe("Lock", function () {
@@ -90,6 +97,24 @@ describe("Lock", function () {
         //   .withArgs(lockedAmount, anyValue); // We accept any value as `when` arg
       });
 
+      it("does 'ca-0' exist? ", async function () {
+        const { lock, owner } = await loadFixture(deployOneYearLockFixture);
+        
+        expect(await lock.checkAssetisAvailable('ca-0')).to.equal(true);
+      });
+  
+      it("does 'ca-1' exist? ", async function () {
+        const { lock, owner } = await loadFixture(deployOneYearLockFixture);
+        
+        expect(await lock.checkAssetisAvailable('ca-1')).to.equal(true);
+      });
+      it("does 'ca-3' exist? ", async function () {
+        const { lock, owner } = await loadFixture(deployOneYearLockFixture);
+        
+        expect(await lock.checkAssetisAvailable('ca-3')).to.equal(true);
+      });
+  
+
 
       it("get all Wills", async function () {
         const { lock, unlockTime, lockedAmount,  owner, otherAccount, thirdAcct } = await loadFixture(
@@ -100,114 +125,158 @@ describe("Lock", function () {
 
       
     });
-    it("create sample Txn0", async function () {
-      const { lock, unlockTime, lockedAmount,  owner, otherAccount, thirdAcct } = await loadFixture(
-        deployOneYearLockFixture
-      );
 
-      printToConsole(await lock.createTxn_zero());
-    });
-    it("create test Txn0", async function () {
+
+    it("create test Txns", async function () {
       const { lock, unlockTime, lockedAmount,  owner, otherAccount, thirdAcct } = await loadFixture(
         deployOneYearLockFixture
       );
-      const metamaskPolygonHelloWorldTesterAddr = "0xf821142CC270dAb63767cFAae15dC36D1b043348";
-      const willStartDate = 20221210;
-      const willEndDate = 20221220;
+      
+      printToConsole(await lock.a_createCryptoVault(
+        "ca-0",
+        willStartDate,
+        willEndDate,
+        hardhat_BenefitorAddr
+        
+      ));
       printToConsole(await lock.a_createCryptoVault(
         "ca-1",
         willStartDate,
         willEndDate,
-       metamaskPolygonHelloWorldTesterAddr
+        hardhat_BenefitorAddr
         
       ));
+
+      
       //check for event
       const { userCreatedBonds } = await lock.getUserCreatedBonds();
       console.log(userCreatedBonds);
     });
 
-  // describe("Deployment", function () {
-  //   it("Should set the right unlockTime", async function () {
-  //     const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
+    describe("Deployment", function () {
+      it("Should have admin role", async function () {
+        const { lock, unlockTime, owner } = await loadFixture(deployOneYearLockFixture);
+        
+        await lock.addADMINrole();
+        
+        expect(await lock.checkIfAddminRoleIsPresent()).to.equal(true);
+      });
+  
+      it("Should set the right owner", async function () {
+        const { lock, owner } = await loadFixture(deployOneYearLockFixture);
+        
+        expect(await lock.owner()).to.equal(owner.address);
+      });
+  
+     
+      it("Should receive and store the funds to lock", async function () {
+        const { lock, lockedAmount } = await loadFixture(
+          deployOneYearLockFixture
+        );
+  
+        expect(await ethers.provider.getBalance(lock.address)).to.equal(
+          lockedAmount
+        );
+      });
+  
+      it("Should fail if the unlockTime is not in the future", async function () {
+        // We don't use the fixture here because we want a different deployment
+        const latestTime = await time.latest();
+        const Lock = await ethers.getContractFactory("Lock");
+        await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
+          "Unlock time should be in the future"
+        );
+      });
+    });
+    
 
-  //     expect(await lock.unlockTime()).to.equal(unlockTime);
-  //   });
 
-  //   it("Should set the right owner", async function () {
-  //     const { lock, owner } = await loadFixture(deployOneYearLockFixture);
 
-  //     expect(await lock.owner()).to.equal(owner.address);
-  //   });
+    describe("Events_createMetamaskTxn", function () {
+      it("Should emit an event on withdrawals", async function () {
+        const { lock, unlockTime, lockedAmount } = await loadFixture(
+          deployOneYearLockFixture
+        );
+        
+        const willId = 2;
+        
+        const maturityDate = 20221220;
+        lockedAmount = 3 * 10 * 1;
+       
+        await expect(
 
-  //   it("Should receive and store the funds to lock", async function () {
-  //     const { lock, lockedAmount } = await loadFixture(
-  //       deployOneYearLockFixture
-  //     );
+                printToConsole(await lock.a_createCryptoVault(
+                  meta_txnAsst,
+                  willStartDate,
+                  willEndDate,
+                meta_benefitorAddr
+            ))
+          ).to.emit(lock, "willCreated")
+          .withArgs(willId, meta_benefitorAddr, willEndDate, lockedAmount); // We accept any value as `when` arg
+          
+          it(`does '${meta_txnAsst}' exist? `, async function () {
+            const { lock, owner } = await loadFixture(deployOneYearLockFixture);
+            
+            expect(await lock.checkAssetisAvailable(meta_txnAsst)).to.equal(false);
+          });
+      });
+    });
 
-  //     expect(await ethers.provider.getBalance(lock.address)).to.equal(
-  //       lockedAmount
-  //     );
-  //   });
+ 
 
-  //   it("Should fail if the unlockTime is not in the future", async function () {
-  //     // We don't use the fixture here because we want a different deployment
-  //     const latestTime = await time.latest();
-  //     const Lock = await ethers.getContractFactory("Lock");
-  //     await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-  //       "Unlock time should be in the future"
-  //     );
-  //   });
-  // });
+  describe("Withdrawals", function () {
+    describe("Validations", function () {
+      it("Should revert with the right error if called too soon", async function () {
+        const { lock } = await loadFixture(deployOneYearLockFixture);
 
-  // describe("Withdrawals", function () {
-  //   describe("Validations", function () {
-  //     it("Should revert with the right error if called too soon", async function () {
-  //       const { lock } = await loadFixture(deployOneYearLockFixture);
+        await expect(lock.withdraw()).to.be.revertedWith(
+          "You can't withdraw yet"
+        );
+      });
 
-  //       await expect(lock.withdraw()).to.be.revertedWith(
-  //         "You can't withdraw yet"
-  //       );
-  //     });
+      it("Should revert with the right error if called from another account", async function () {
+        const { lock, unlockTime, otherAccount } = await loadFixture(
+          deployOneYearLockFixture
+        );
 
-  //     it("Should revert with the right error if called from another account", async function () {
-  //       const { lock, unlockTime, otherAccount } = await loadFixture(
-  //         deployOneYearLockFixture
-  //       );
+        // We can increase the time in Hardhat Network
+        await time.increaseTo(unlockTime);
 
-  //       // We can increase the time in Hardhat Network
-  //       await time.increaseTo(unlockTime);
+        // We use lock.connect() to send a transaction from another account
+        await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWith(
+          "You aren't the owner"
+        );
+      });
 
-  //       // We use lock.connect() to send a transaction from another account
-  //       await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWith(
-  //         "You aren't the owner"
-  //       );
-  //     });
+      it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
+        const { lock, unlockTime } = await loadFixture(
+          deployOneYearLockFixture
+        );
 
-  //     it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
-  //       const { lock, unlockTime } = await loadFixture(
-  //         deployOneYearLockFixture
-  //       );
+        // Transactions are sent using the first signer by default
+        await time.increaseTo(unlockTime);
 
-  //       // Transactions are sent using the first signer by default
-  //       await time.increaseTo(unlockTime);
+        await expect(lock.withdraw()).not.to.be.reverted;
+      });
+    });
 
-  //       await expect(lock.withdraw()).not.to.be.reverted;
-  //     });
-  //   });
+    describe("Events_settleAssets", function () {
+      it("Should emit an event on withdrawals", async function () {
+        const { lock, unlockTime, lockedAmount } = await loadFixture(
+          deployOneYearLockFixture
+        );
 
-  //   describe("Events", function () {
-  //     it("Should emit an event on withdrawals", async function () {
-  //       const { lock, unlockTime, lockedAmount } = await loadFixture(
-  //         deployOneYearLockFixture
-  //       );
+        const willId = 2;
+        const benefitorAddr = 0xf821142CC270dAb63767cFAae15dC36D1b043348;
+        const maturityDate = 20221220;
+        lockedAmount = 3 * 10 * 1;
+        //await time.increaseTo(unlockTime);
 
-  //       await time.increaseTo(unlockTime);
-
-  //       await expect(lock.withdraw())
-  //         .to.emit(lock, "Withdrawal")
-  //         .withArgs(lockedAmount, anyValue); // We accept any value as `when` arg
-  //     });
-  //   });
+        await expect(lock.settleAssets(0))
+          .to.emit(lock, "willSettled")
+          .withArgs(willId, benefitorAddr, maturityDate, lockedAmount); // We accept any value as `when` arg
+      });
+    });
 
     describe("checkUpKeep", function () {
       it("returns false if people havent", async function () {

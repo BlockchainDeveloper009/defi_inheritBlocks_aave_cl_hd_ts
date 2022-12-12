@@ -115,7 +115,9 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     }
 
     // function receive() external payable { }
-    function getAsset(string memory _assetId) external view returns (bool) {
+    function checkAssetisAvailable(
+        string memory _assetId
+    ) external view returns (bool) {
         return (cryptoAssets[_assetId].isValue == true);
     }
 
@@ -175,10 +177,6 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         address payable Benefitors
     ) public payable {
         require(
-            adminrole[msg.sender] == true,
-            "You must be an admin to do this"
-        );
-        require(
             cryptoAssets[_assetId].isValue == true, //"' "+_assetId + "' crypto asset Not found"
             "' crypto asset Not found"
         );
@@ -229,6 +227,14 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         // @todo implement maturity date based wills
     }
 
+    modifier onlyAdmin() {
+        require(
+            adminrole[msg.sender] == true,
+            "You must be an admin to do this"
+        );
+        _;
+    }
+
     //this function is to initialize the admin role. This will provide the devs with funds
     function addADMINrole() external payable {
         // require (msg.value == 0 ether, " please send .001 ether");
@@ -272,6 +278,8 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             s_willlInfo[willId].s_baseStatus == baseStatus.Started,
             "Will not in Start Status"
         );
+        //require for maturity date comparisoin
+        //add only owner can call
         // s_willlInfo[willId].Benefitors.transfer(
         //     cryptoAssets[asst].amount);
 
