@@ -100,6 +100,25 @@ describe("Lock", function () {
 
       
     });
+    it("create sample Txn0", async function () {
+      const { lock, unlockTime, lockedAmount,  owner, otherAccount, thirdAcct } = await loadFixture(
+        deployOneYearLockFixture
+      );
+
+      printToConsole(await lock.createTxn_zero());
+    });
+    it("create test Txn0", async function () {
+      const { lock, unlockTime, lockedAmount,  owner, otherAccount, thirdAcct } = await loadFixture(
+        deployOneYearLockFixture
+      );
+
+      printToConsole(await lock.a_createCryptoVault(
+        "ca-0",
+        20221210,
+        20221220,
+        "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2"
+      ));
+    });
 
   // describe("Deployment", function () {
   //   it("Should set the right unlockTime", async function () {

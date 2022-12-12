@@ -14,9 +14,22 @@ npx hardhat run scripts/deploy.ts
 
 >>> deploy scripts
 >>>> local
-    npx hardhat run .\scripts\01_deploy_erc20WWeth.js --network mumbai
+>>>>>>start local node
+    npx hardhat node
+    npx hardhat run .\scripts\01_deployLocally_erc20WWeth.js --network localhost
 >>>> network
     npx hardhat run .\scripts\01_deploy_networks_erc20WWeth.js --network mumbai
 
 >>> run test 
 npx hardhat test .\test\tests_erc20WWeth\unitTests_erc20Wweth\WillCreator.test.js
+
+
+
+
+
+>>> environment setup
+
+npm init --yes
+npm install --save-dev hardhat
+npx hardhat
+npm install --save-dev @nomicfoundation/hardhat-toolbox

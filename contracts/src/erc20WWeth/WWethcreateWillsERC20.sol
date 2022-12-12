@@ -75,6 +75,10 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         uint256 willMaturityDate,
         uint cryptoWillId
     );
+    struct willsByMaturitydates {
+        uint maturityDate;
+        uint willId;
+    }
 
     // function createCashvault () external {
 
@@ -118,7 +122,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         // createCryptoVault("ca-1", 7, 7,100,["0x17F6AD8Ef982297579C203069C1DbfFE4348c372"]);
     }
 
-    function createTxn_zero() external {
+    function createTxn_zero() external payable {
         a_createCryptoVault(
             "ca-0",
             20221210,
@@ -127,7 +131,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         );
     }
 
-    function createTxn_one() external {
+    function createTxn_one() external payable {
         a_createCryptoVault(
             "ca-1",
             20221210,
@@ -171,7 +175,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             cryptoAssets[_assetId].amount
         );
 
-        userCreatedWills[msg.sender].push(s_willlInfo);
+        userCreatedWills[msg.sender].push(s_willlInfo[s_currentBondId]);
         uint dateHash = generateHash(willMaturityDate);
         s_WillsByMaturityDate[willMaturityDate].push(s_currentBondId);
         //s_maturityDates.push(s_willlInfo);
@@ -221,7 +225,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     //returns Bonds created by a single user
     function getUserCreatedBonds(
         address addr
-    ) external view returns (uint[] memory) {
+    ) external view returns (willlInfo[] memory) {
         return userCreatedWills[addr];
     }
 
@@ -267,19 +271,27 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         return i_entranceFee;
     }
 
-    function getMaturityDates() {}
+    function getMaturityDates() public {}
 
     function getWillsByMaturityDates()
         public
         view
-        returns (willlInfo[] memory)
+        returns (willsByMaturitydates[] memory)
     {
-        // willlInfo[] memory loc;
-        // for(uint i=0;i<s_maturityDates.length;i++)
+        willsByMaturitydates[] memory loc;
+        int k = 0;
+        // for(uint i=0;i<s_WillsByMaturityDate.length;i++)
         // {
-        //     loc.push(s_maturityDates[i])
+
+        //     for(uint j=0;j< s_WillsByMaturityDate[s_MaturityDates[i]].length; j++)
+        //     {
+        //         loc[k].maturityDate = s_WillsByMaturityDate[i];
+        //         loc[k].willId =  s_WillsByMaturityDate[s_MaturityDates[i]][j];
+        //     }
+
         // }
-        // return ;
+
+        return loc;
     }
 
     function generateHash(uint matDate) public returns (uint) {
