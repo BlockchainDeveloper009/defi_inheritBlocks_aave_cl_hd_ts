@@ -46,8 +46,12 @@ contract WWethBase20 is WWeth20 {
         string Name;
         uint256 amount;
         bool isValue;
+        cryptoAssetStatus assetStatus;
     }
-
+    enum cryptoAssetStatus {
+        Created,
+        Assigned
+    }
     mapping(address => uint) balances;
     mapping(address => mapping(address => bool)) approved;
 

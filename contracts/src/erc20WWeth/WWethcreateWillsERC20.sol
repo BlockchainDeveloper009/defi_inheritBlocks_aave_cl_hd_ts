@@ -67,12 +67,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
 
     //this is to create an ADMIN role
     mapping(address => bool) public adminrole;
-    enum Status {
-        Created,
-        Started,
-        Matured,
-        Settled
-    }
+
     /* Events */
     event willCreated(
         string indexed willofPropertyName,
@@ -96,10 +91,25 @@ contract WWethcreateWillsERC20 is WWethBase20 {
 
     // }
 
+    modifier onlyAdmin() {
+        require(
+            adminrole[msg.sender] == true,
+            "You must be an admin to do this"
+        );
+        _;
+    }
+    modifier onlyAsset(string memory locId) {
+        require(
+            cryptoAssets[locId].assetStatus != cryptoAssetStatus.Created,
+            "Asset is not valid"
+        );
+        _;
+    }
+
     function createAsset(
         string memory assetName,
         uint256 assetAmount
-    ) public payable {
+    ) public payable onlyAsset(assetName) {
         //,
         string memory locId = string.concat(
             "ca-",
@@ -110,7 +120,8 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         cryptoAssets[locId].Name = assetName;
         cryptoAssets[locId].amount = assetAmount;
 
-        cryptoAssets[locId].isValue = true;
+        cryptoAssets[locId].assetStatus = cryptoAssetStatus.Created;
+
         s_assetsCurrentId++;
     }
 
@@ -177,7 +188,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         address payable Benefitors
     ) public payable {
         require(
-            cryptoAssets[_assetId].isValue == true, //"' "+_assetId + "' crypto asset Not found"
+            cryptoAssets[_assetId].assetStatus == cryptoAssetStatus.Created, //"' "+_assetId + "' crypto asset Not found"
             "' crypto asset Not found"
         );
 
@@ -190,8 +201,8 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         s_willlInfo[s_currentBondId].willOwner = msg.sender;
         s_willlInfo[s_currentBondId].s_baseStatus = baseStatus.Started;
         s_willlInfo[s_currentBondId].Benefitors = payable(Benefitors);
-        cryptoAssets[_assetId].isValue = false;
 
+        cryptoAssets[_assetId].assetStatus = cryptoAssetStatus.Assigned;
         _mint(
             address(this),
             //s_currentBondId,
@@ -225,14 +236,6 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             s_currentBondId - 1
         );
         // @todo implement maturity date based wills
-    }
-
-    modifier onlyAdmin() {
-        require(
-            adminrole[msg.sender] == true,
-            "You must be an admin to do this"
-        );
-        _;
     }
 
     //this function is to initialize the admin role. This will provide the devs with funds
