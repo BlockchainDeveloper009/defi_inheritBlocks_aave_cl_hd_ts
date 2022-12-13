@@ -318,13 +318,13 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     //0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
     //0x540d7E428D5207B30EE03F2551Cbb5751D3c7569
 
-    // fallback() external override payable {
-    //     // custom function code
-    // }
+    fallback() external payable override {
+        // custom function code
+    }
 
-    // receive() external overpayable {
-    //     // custom function code
-    // }
+    receive() external overpayable {
+        // custom function code
+    }
 
     function getEntranceFee() public view returns (uint256) {
         return i_entranceFee;
@@ -430,6 +430,4 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     //     // // Quiz... is this redundant?
     //     // emit RequestedRaffleWinner(requestId);
     // }
-
-    function receive() external {}
 }
