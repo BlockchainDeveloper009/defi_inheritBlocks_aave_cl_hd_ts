@@ -3,6 +3,18 @@ import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
+let debugMode = true;
+//https://ethereum.stackexchange.com/questions/52913/how-can-i-get-the-data-returned-from-solidity-function-from-transaction-id-in-we
+function printToConsole(str:any)
+{ if(debugMode)
+  {
+    console.log('--------------')
+    console.log(str);
+    console.log('==============')
+  }
+  
+}
+
 describe("Lock", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
@@ -19,7 +31,8 @@ describe("Lock", function () {
 
     const Lock = await ethers.getContractFactory("Lock");
     const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
+    
+    printToConsole(`contractAddr: ${lock.deployTransaction.creates}`)
     return { lock, unlockTime, lockedAmount, owner, otherAccount };
   }
 

@@ -98,18 +98,27 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         );
         _;
     }
-    modifier onlyAsset(string memory locId) {
+    modifier onlyValidAsset(string memory locId) {
         require(
-            cryptoAssets[locId].assetStatus != cryptoAssetStatus.Created,
-            "Asset is not valid"
+            cryptoAssets[locId].assetStatus == cryptoAssetStatus.Created,
+            "Asset is not in Created Status "
         );
         _;
     }
 
+    // modifier onlyNewAsset(string memory locId) {
+    //     require(
+    //         (cryptoAssets[locId].assetStatus != cryptoAssetStatus.Created &&
+    //         cryptoAssets[locId].assetStatus != cryptoAssetStatus.Assigned ),
+    //         "onlyNewAssets"
+    //     );
+    //     _;
+    // }
+
     function createAsset(
         string memory assetName,
         uint256 assetAmount
-    ) public payable onlyAsset(assetName) {
+    ) public returns (string memory) {
         //,
         string memory locId = string.concat(
             "ca-",
@@ -123,13 +132,15 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         cryptoAssets[locId].assetStatus = cryptoAssetStatus.Created;
 
         s_assetsCurrentId++;
+        return locId;
     }
 
     // function receive() external payable { }
     function checkAssetisAvailable(
         string memory _assetId
     ) external view returns (bool) {
-        return (cryptoAssets[_assetId].isValue == true);
+        return (cryptoAssets[_assetId].assetStatus ==
+            cryptoAssetStatus.Created);
     }
 
     function getAllAsset() external view returns (string[] memory) {
@@ -186,12 +197,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         uint256 willStartDate,
         uint256 willMaturityDate,
         address payable Benefitors
-    ) public payable {
-        require(
-            cryptoAssets[_assetId].assetStatus == cryptoAssetStatus.Created, //"' "+_assetId + "' crypto asset Not found"
-            "' crypto asset Not found"
-        );
-
+    ) public payable onlyValidAsset(_assetId) {
         s_willlInfo[s_currentBondId].assetId = _assetId;
         uint256 m_willCreationTimeStamp = block.timestamp;
 
