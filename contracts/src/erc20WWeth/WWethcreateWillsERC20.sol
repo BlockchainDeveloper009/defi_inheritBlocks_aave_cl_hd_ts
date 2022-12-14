@@ -136,7 +136,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         return s_arr_cryptoAssetIds;
     }
 
-    function init() external {
+    function init() external virtual {
         uint256 amt1 = 1 * 10 * 18;
         uint256 amt2 = 2 * 10 * 18;
         uint256 amt3 = 3 * 10 * 18;
@@ -150,7 +150,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         // createCryptoVault("ca-1", 7, 7,100,["0x17F6AD8Ef982297579C203069C1DbfFE4348c372"]);
     }
 
-    function createTxn_zero() external payable {
+    function createTxn_zero() external payable virtual {
         a_createCryptoVault(
             "ca-0",
             20221210,
@@ -159,7 +159,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         );
     }
 
-    function createTxn_one() external payable {
+    function createTxn_one() external payable virtual {
         a_createCryptoVault(
             "ca-1",
             20221210,
@@ -322,7 +322,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         // custom function code
     }
 
-    receive() external overpayable {
+    receive() external payable override {
         // custom function code
     }
 

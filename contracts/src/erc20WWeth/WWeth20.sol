@@ -12,10 +12,10 @@ contract WWeth20 is ERC20 {
     constructor() ERC20("Wrapped Will Ether", "WWETH") {}
 
     // Function to receive Ether. msg.data must be empty
-    receive() external payable {}
+    receive() external payable virtual {}
 
     // Fallback function is called when msg.data is not empty
-    fallback() external payable {
+    fallback() external payable virtual {
         deposit();
     }
 

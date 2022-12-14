@@ -46,3 +46,26 @@ main(hre).catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+async function verify (contractAddress, args) {
+  console.log("verifying contract..")
+  try{
+    await run("verify:verify", {
+      address: contractAddress,
+      constructorArguments: args,
+    })
+
+
+
+
+
+
+    
+  } catch (e) {
+    if(e.message.toLowerCase().includes("already verified")){
+      console.log("Already Verified!")
+    }else{
+      console.log(e)
+    }
+  }
+}

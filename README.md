@@ -23,7 +23,10 @@ npx hardhat run scripts/deploy.ts
 >>> run test 
 npx hardhat test .\test\tests_erc20WWeth\unitTests_erc20Wweth\WillCreator.test.js
 
+npx hardhat test .\test\tests_erc20WWeth\unitTests_erc20Wweth\WillCreator.test.js --network localhost
 
+stage
+npx hardhat test .\test\tests_erc20WWeth\staging_erc20Wweth\WWethcreateWillsERC20.staging.test.js --network localhost
 
 
 
