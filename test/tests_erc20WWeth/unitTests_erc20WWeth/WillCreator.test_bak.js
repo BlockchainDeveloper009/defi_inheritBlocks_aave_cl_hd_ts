@@ -296,3 +296,20 @@ describe("Main_describe", function () {
 
 });
 
+
+//VITE_FIREBASE={"apiKey":"slslsls","slsls":"lelsls"}
+//const p = process?.env ? process.env : import.meta.env;
+//const firebase_config = JSON.parse(p.VITE_FIREBASE);
+/*
+CLIENT_SECRET = "{
+  "type": "service_account",
+  "project_id": "gobirdie-landing-page",
+  "private_key_id": "xxxxx",
+  "private_key": "-----BEGIN PRIVATE KEY----- xxxxx -----END PRIVATE KEY-----\n",
+  "client_email": "xxxxxxx@gobirdie-landing-page.iam.gserviceaccount.com",
+  "client_id": "xxxxxxxxx",
+  "auth_uri": "xxxxxx",
+  "token_uri": "xxxxxxx": "xxxxxxxx": "xxxxxxxxx"
+}" 
+
+*/

@@ -99,7 +99,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     }
     modifier onlyValidAsset(string memory locId) {
         require(
-            cryptoAssets[locId].isAvailable != true,
+            cryptoAssets[locId].isAvailable == true,
             "Asset is not in Created Status "
         );
         _;
@@ -209,7 +209,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         s_willlInfo[s_currentBondId].willOwner = msg.sender;
         s_willlInfo[s_currentBondId].s_baseStatus = baseStatus.Started;
         s_willlInfo[s_currentBondId].Benefitors = payable(Benefitors);
-
+        cryptoAssets[_assetId].isAvailable = false;
         cryptoAssets[_assetId].assetStatus = cryptoAssetStatus.Assigned;
         _mint(
             address(this),
