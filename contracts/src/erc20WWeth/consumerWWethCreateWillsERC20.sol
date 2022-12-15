@@ -14,7 +14,7 @@ import "./WWethcreateWillsERC20.sol";
 import "hardhat/console.sol";
 
 contract consumeWWethcreateWillsERC20 is WWethcreateWillsERC20 {
-    function init1() external override {
+    function init1() external {
         uint256 amt1 = 1 * 10 * 18;
 
         createAsset("t1", amt1);
@@ -22,13 +22,13 @@ contract consumeWWethcreateWillsERC20 is WWethcreateWillsERC20 {
         // createCryptoVault("ca-1", 7, 7,100,["0x17F6AD8Ef982297579C203069C1DbfFE4348c372"]);
     }
 
-    function init2() external override {
+    function init2() external {
         uint256 amt2 = 2 * 10 * 18;
 
         createAsset("t2", amt2);
     }
 
-    function init3() external override {
+    function init3() external {
         uint256 amt3 = 3 * 10 * 18;
 
         createAsset("t3", amt3);

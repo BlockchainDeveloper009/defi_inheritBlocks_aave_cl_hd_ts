@@ -45,7 +45,7 @@ contract WWethBase20 is WWeth20 {
         string AssetId;
         string Name;
         uint256 amount;
-        bool isValue;
+        bool isAvailable;
         cryptoAssetStatus assetStatus;
     }
     enum cryptoAssetStatus {

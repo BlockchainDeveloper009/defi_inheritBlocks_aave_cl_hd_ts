@@ -44,26 +44,25 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     error Raffle__UpkeepNotNeeded();
     /* states variables */
     mapping(string => cryptoAssetInfo) public cryptoAssets;
-    string[] s_arr_cryptoAssetIds;
+    string[] private s_arr_cryptoAssetIds;
     uint256 s_assetsCurrentId = 0;
     uint256 s_currentBondId = 0;
     uint256 private immutable i_entranceFee = 1;
 
-    bool s_DoesAdminExist;
+    bool private s_DoesAdminExist;
 
-    bool s_OneBondinCirculation;
+    bool private s_OneBondinCirculation;
 
     // JSON-like structure containing info on each bond
     // mapping of a bond to its information (of type Info above)
     mapping(uint256 => willlInfo) public s_willlInfo;
-    address s_bondBankAddress;
 
     //this line is to create an array to keep track of the bonds
-    willlInfo[] public s_willsinExistence;
+    willlInfo[] private s_willsinExistence;
 
-    mapping(address => willlInfo[]) public userCreatedWills;
-    mapping(uint => uint[]) public s_WillsByMaturityDate;
-    mapping(uint => uint) public s_MaturityDates;
+    mapping(address => willlInfo[]) private userCreatedWills;
+    mapping(uint => uint[]) private s_WillsByMaturityDate;
+    mapping(uint => uint) private s_MaturityDates;
 
     //this is to create an ADMIN role
     mapping(address => bool) public adminrole;
@@ -100,7 +99,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     }
     modifier onlyValidAsset(string memory locId) {
         require(
-            cryptoAssets[locId].assetStatus == cryptoAssetStatus.Created,
+            cryptoAssets[locId].isAvailable != true,
             "Asset is not in Created Status "
         );
         _;
@@ -128,7 +127,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         cryptoAssets[locId].AssetId = locId;
         cryptoAssets[locId].Name = assetName;
         cryptoAssets[locId].amount = assetAmount;
-
+        cryptoAssets[locId].isAvailable = true;
         cryptoAssets[locId].assetStatus = cryptoAssetStatus.Created;
 
         s_assetsCurrentId++;
@@ -140,7 +139,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         string memory _assetId
     ) external view returns (bool) {
         return (cryptoAssets[_assetId].assetStatus ==
-            cryptoAssetStatus.Created);
+            cryptoAssetStatus.Assigned);
     }
 
     function getAllAsset() external view returns (string[] memory) {
@@ -198,8 +197,11 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         uint256 willMaturityDate,
         address payable Benefitors
     ) public payable onlyValidAsset(_assetId) {
+        require(
+            cryptoAssets[_assetId].isAvailable == true,
+            "required Asset not available"
+        );
         s_willlInfo[s_currentBondId].assetId = _assetId;
-        uint256 m_willCreationTimeStamp = block.timestamp;
 
         s_willlInfo[s_currentBondId].willStartDate = willStartDate;
         s_willlInfo[s_currentBondId].willMaturityDate = willMaturityDate;
@@ -219,16 +221,26 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         s_WillsByMaturityDate[willMaturityDate].push(s_currentBondId);
         //s_maturityDates.push(s_willlInfo);
         s_MaturityDates[willMaturityDate]++;
-        // s_willsinExistence.push(
-        //     willlInfo(
-        //         _assetId,
-        //         m_willCreationTimeStamp,
-        //         willMaturityDate,
-        //         msg.sender
-        //     )
-        // );
-
-        //payable(msg.sender).transfer(cryptoAssets[_assetId].amount);
+        s_willsinExistence.push(
+            willlInfo(
+                _assetId,
+                willStartDate,
+                willMaturityDate,
+                msg.sender,
+                s_willlInfo[s_currentBondId].willManager,
+                s_willlInfo[s_currentBondId].Benefitors,
+                s_willlInfo[s_currentBondId].s_baseStatus
+            )
+        );
+        /*      string assetId;
+        uint256 willStartDate;
+        uint256 willMaturityDate;
+        address willOwner;
+        address willManager;
+        address payable Benefitors;
+        baseStatus s_baseStatus;
+        */
+        payable(msg.sender).transfer(cryptoAssets[_assetId].amount);
         // transferFrom(msg.sender, address(this), cryptoAssets[_assetId].amount);
 
         unchecked {
@@ -285,7 +297,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         string memory asst = s_willlInfo[willId].assetId;
         require(
             s_willlInfo[willId].s_baseStatus == baseStatus.Started,
-            "Will not in Start Status"
+            "Will is not in Start Status"
         );
         //require for maturity date comparisoin
         //add only owner can call
