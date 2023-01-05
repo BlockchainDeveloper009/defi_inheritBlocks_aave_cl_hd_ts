@@ -31,6 +31,7 @@ contract WWethBase20 is WWeth20 {
     }
     struct willlInfo {
         //Person willCreator;
+        uint willId;
         string assetId;
         uint256 willStartDate;
         uint256 willMaturityDate;

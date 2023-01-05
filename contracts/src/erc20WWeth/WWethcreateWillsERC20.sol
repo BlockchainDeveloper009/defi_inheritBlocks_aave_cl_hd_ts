@@ -201,6 +201,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             cryptoAssets[_assetId].isAvailable == true,
             "required Asset not available"
         );
+        s_willlInfo[s_currentBondId].willId = s_currentBondId;
         s_willlInfo[s_currentBondId].assetId = _assetId;
 
         s_willlInfo[s_currentBondId].willStartDate = willStartDate;
