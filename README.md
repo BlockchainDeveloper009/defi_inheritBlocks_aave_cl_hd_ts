@@ -36,3 +36,13 @@ npm init --yes
 npm install --save-dev hardhat
 npx hardhat
 npm install --save-dev @nomicfoundation/hardhat-toolbox
+
+12-dec-22
+contractaddr=0xA9e7A34F06B54aabBDcdF47747eb590c93e400d9
+https://mumbai.polygonscan.com/address/0x6e6BE4038EC867D426FF246c94DbdB8Ed8Ec66Fe#code
+
+01-jan-23
+0x03C5958b53233dd659EBAECFD5d42fEFdc4D1fDf
+https://mumbai.polygonscan.com/address/0x6a054EBC3107f60F7f2f3473fB28486545eE3307#code
+
+solc --userdoc --devdoc ex1.sol

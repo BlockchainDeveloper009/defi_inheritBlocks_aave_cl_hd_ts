@@ -224,6 +224,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         s_MaturityDates[willMaturityDate]++;
         s_willsinExistence.push(
             willlInfo(
+                s_currentBondId,
                 _assetId,
                 willStartDate,
                 willMaturityDate,
