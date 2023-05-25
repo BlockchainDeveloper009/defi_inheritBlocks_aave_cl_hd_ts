@@ -10,10 +10,7 @@ async function main(hre) {
 
   //const lockedAmount = ethers.utils.parseEther("1");
 
-  const localDeploymentPublicAddr1 = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
-  const localDeploymentPrivateAddr1 = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-  
-  const Lock = await ethers.getContractFactory("WWethcreateWillsERC20");
+  const Lock = await ethers.getContractFactory("LegendsofKrump");
   //const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
   const lock = await Lock.deploy();
 
@@ -37,7 +34,7 @@ async function main(hre) {
      constructorArguments: [],
    });
 
-  console.log(` 'WWethcreateWillsERC20' deployed to ${lock.address}`);
+  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
 }
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -49,3 +46,26 @@ main(hre).catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+async function verify (contractAddress, args) {
+  console.log("verifying contract..")
+  try{
+    await run("verify:verify", {
+      address: contractAddress,
+      constructorArguments: args,
+    })
+
+
+
+
+
+
+    
+  } catch (e) {
+    if(e.message.toLowerCase().includes("already verified")){
+      console.log("Already Verified!")
+    }else{
+      console.log(e)
+    }
+  }
+}
