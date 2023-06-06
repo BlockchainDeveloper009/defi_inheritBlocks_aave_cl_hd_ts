@@ -4,7 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "default_local": "npx hardhat run .\\scripts\\01_deployLocally_erc20WWeth.js --network localhost",
+    "separate_local": "npx hardhat run .\\scripts\\01_deployLocally_erc20WWeth.js --config localhost.config.js",
+    "test:inheritance": "scripts/checks/inheritance-ordering.js artifacts/build-info/*",
+    "test:generation": "scripts/checks/generation.sh",
+    "gas-report": "env ENABLE_GAS_REPORT=true npm run test",
+    "slither": "npm run clean && slither .",
+    "run-test": "npx hardhat test",
+    "run-temporary-contracts-test": "npx hardhat test .\\test\\tests_temporary-contracts\\test_Caller.test.js"
+
   },
   "repository": {
     "type": "git",
@@ -19,6 +28,7 @@
   "homepage": "https://github.com/BlockchainDeveloper009/defi_inheritBlocks_aave_cl_hd_ts#readme",
   "dependencies": {
     "@chainlink/contracts": "^0.5.1",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@nomicfoundation/solidity-analyzer-win32-x64-msvc": "^0.1.0",
     "@openzeppelin/contracts": "^4.8.0",
     "dotenv": "^16.0.3"

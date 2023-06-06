@@ -2,6 +2,7 @@ const {ethers} = require("hardhat");
 const { HardhatConfig, HardhatUserConfig } = require("hardhat/types");
 
 const { extendConfig, extendEnvironment } = require("hardhat/config");
+const fs = require('fs'); 
 
 async function main(hre) {
   const currentTimestampInSeconds = Math.round(Date.now() / 1000);
@@ -12,8 +13,8 @@ async function main(hre) {
 
   const localDeploymentPublicAddr1 = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
   const localDeploymentPrivateAddr1 = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-  
-  const Lock = await ethers.getContractFactory("WWethcreateWillsERC20");
+  const contractName = ["WWethcreateWillsERC20"]
+  const Lock = await ethers.getContractFactory(contractName[0]);
   //const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
   const lock = await Lock.deploy();
 
@@ -23,6 +24,15 @@ async function main(hre) {
    const deployedVerifyContract = await Lock.deploy();
 
    await deployedVerifyContract.deployed();
+
+   const currentDate = new Date();
+   content = `$ ${currentDate} | ${contractName[0]} | ${lock.address} `
+   fs.appendFile('./erc20deploymentLog.txt', content, (err) => {
+     if (err) {
+       console.error(err);
+       return;
+     }
+   });
  
    // print the address of the deployed contract
    console.log("Verify Contract Address:", deployedVerifyContract.address);
@@ -38,6 +48,9 @@ async function main(hre) {
    });
 
   console.log(` 'WWethcreateWillsERC20' deployed to ${lock.address}`);
+
+    console.log('Content written to file successfully.');
+  
 }
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

@@ -46,3 +46,4 @@ https://mumbai.polygonscan.com/address/0x6e6BE4038EC867D426FF246c94DbdB8Ed8Ec66F
 https://mumbai.polygonscan.com/address/0x6a054EBC3107f60F7f2f3473fB28486545eE3307#code
 
 solc --userdoc --devdoc ex1.sol
+[to start local ode](npx hardhat node | )
