@@ -47,3 +47,13 @@ https://mumbai.polygonscan.com/address/0x6a054EBC3107f60F7f2f3473fB28486545eE330
 
 solc --userdoc --devdoc ex1.sol
 [to start local ode](npx hardhat node | )
+
+Run Scripts from package.json 
+
+$npm run run-test 
+    <run-test is mentioned under scripts section in package>
+
+Run tasks from hardhat.config.ts
+    $npx hardhat accounts
+
+

@@ -3,6 +3,11 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
+require("@nomiclabs/hardhat-web3");
+//require("@nomiclabs/hardhat-ethers");
+//console.log(await web3.eth.getBlockNumber());
+
+
 
 describe("temporary-contracts", function () {
 
@@ -32,6 +37,14 @@ describe("temporary-contracts", function () {
           console.log(`t ===> ${t}`);
           console.log(t);
             expect(t).to.equal(1000);
+            
+        });
+        it("'ethers' gets Block Number ", async function () {
+            console.log(await ethers.provider.getBlockNumber());
+            
+        });
+        it("'web3' gets Block Number ", async function () {
+            console.log(await web3.eth.getBlockNumber());
             
         });
 

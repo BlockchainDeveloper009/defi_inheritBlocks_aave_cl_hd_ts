@@ -36,6 +36,8 @@ import "hardhat/console.sol";
  * - find out why contract doesnt get credited
  * - create new ds to fetch wills by maturity date either struct or new mapping + array combination
  * - Access control: https://docs.openzeppelin.com/contracts/3.x/extending-contracts#using-hooks
+ * 
+ * DeployVersion-15.0.0
  */
 //error Raffle__UpkeepNotNeeded1(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
 
@@ -68,12 +70,33 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     mapping(address => bool) public adminrole;
 
     /* Events */
+    /** 
+        @param assetId: Property name or address for ex. Town home located in Santa clara, 3490 Moretti lane, Milipitas,CA
+
+    */
+    event assetCreated(
+        string assetId,
+        string assetName,
+        uint256 assetAmount
+    );
+    /**  
+    @param willofPropertyName: Property name or address for ex. Town home located in Santa clara, 3490 Moretti lane, Milipitas,CA
+    @param willStartDate: When will Starts
+    @param willMaturityDate: deadline after which will gets executed automatically
+    @param cryptoWillId: Crypto property such as BTC, ETH
+    */
     event willCreated(
-        string indexed willofPropertyName,
+        string willofPropertyName,
         uint256 willStartDate,
         uint256 willMaturityDate,
         uint cryptoWillId
     );
+      /**  
+    @param cryptoWillId: Property name or address for ex. Town home located in Santa clara, 3490 Moretti lane, Milipitas,CA
+    @param benefitor: who gets the funds
+    @param willMaturityDate: deadline after which will gets executed automatically
+    @param willAmount: will amount
+    */
     event willSettled(
         uint indexed cryptoWillId,
         address indexed benefitor,
@@ -98,8 +121,10 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         _;
     }
     modifier onlyValidAsset(string memory locId) {
+        console.log('asset--> ');
+        //console.log(cryptoAssets[locId].assetStatus);
         require(
-            cryptoAssets[locId].isAvailable == true,
+            cryptoAssets[locId].assetStatus == cryptoAssetStatus.Created,
             "Asset is not in Created Status "
         );
         _;
@@ -114,10 +139,17 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     //     _;
     // }
 
+    /**  
+    @param assetName: Property name or address for ex. Town home located in Santa clara, 3490 Moretti lane, Milipitas,CA
+    @param assetAmount: who gets the funds
+    
+    
+    */
+
     function createAsset(
         string memory assetName,
         uint256 assetAmount
-    ) public returns (string memory) {
+    ) public {
         //,
         string memory locId = string.concat(
             "ca-",
@@ -131,15 +163,24 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         cryptoAssets[locId].assetStatus = cryptoAssetStatus.Created;
 
         s_assetsCurrentId++;
-        return locId;
+        console.log(
+        "assert created locId %s assetName-- %s --assetAmount-- %s tokens",
+        
+        locId,
+        assetName,
+        assetAmount
+    );
+        emit assetCreated(locId,assetName,assetAmount);
+       
     }
 
     // function receive() external payable { }
+    
     function checkAssetisAvailable(
         string memory _assetId
     ) external view returns (bool) {
         return (cryptoAssets[_assetId].assetStatus ==
-            cryptoAssetStatus.Assigned);
+            cryptoAssetStatus.Created);
     }
 
     function getAllAsset() external view returns (string[] memory) {
@@ -186,21 +227,23 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             payable(0xf821142CC270dAb63767cFAae15dC36D1b043348)
         );
     }
-
+     /** @dev 
+      *  @notice gets contract balance 
+     * 
+    */
     function c_getContractBalance() public view returns (uint) {
         return address(this).balance;
     }
-
+     /** @dev this function is to initialize the admin role. This will provide the devs with funds 
+     * 
+    */
     function a_createCryptoVault(
         string memory _assetId,
         uint256 willStartDate,
         uint256 willMaturityDate,
         address payable Benefitors
     ) public payable onlyValidAsset(_assetId) {
-        require(
-            cryptoAssets[_assetId].isAvailable == true,
-            "required Asset not available"
-        );
+        
         s_willlInfo[s_currentBondId].willId = s_currentBondId;
         s_willlInfo[s_currentBondId].assetId = _assetId;
 
@@ -258,7 +301,10 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         // @todo implement maturity date based wills
     }
 
-    //this function is to initialize the admin role. This will provide the devs with funds
+    
+    /** @dev this function is to initialize the admin role. This will provide the devs with funds 
+     * 
+    */
     function addADMINrole() external payable {
         // require (msg.value == 0 ether, " please send .001 ether");
         require(
@@ -272,7 +318,14 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         adminrole[msg.sender] = true;
         s_DoesAdminExist = true;
     }
-
+     /**  
+      * 
+    @notice : "provies all bonds created by an address"
+    @param addr: Property name or address for ex. Town home located in Santa clara, 3490 Moretti lane, Milipitas,CA
+    
+    @return : returns array of userCreaedWills for a user address
+    
+    */
     //returns Bonds created by a single user
     function getUserCreatedBonds(
         address addr
@@ -284,7 +337,13 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     function getAllBonds() external view returns (willlInfo[] memory) {
         return s_willsinExistence;
     }
-
+    /**  
+    * 
+    @notice : "provies all bodns created for an address"
+    
+    @return : string which is Asset id
+    
+    */
     // returns true, if admin flag is set to calling address;else false
     function checkIfAddminRoleIsPresent() public view returns (bool) {
         if (adminrole[msg.sender] == true) {
@@ -295,6 +354,12 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     }
 
     //0x1c91347f2A44538ce62453BEBd9Aa907C662b4bD
+         /**  
+      * 
+    @notice : "provies all bodns created for an address"
+    @param willId: Property name or address for ex. Town home located in Santa clara, 3490 Moretti lane, Milipitas,CA
+    
+    */
     function settleAssets(uint256 willId) public payable {
         string memory asst = s_willlInfo[willId].assetId;
         require(
@@ -318,7 +383,14 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             cryptoAssets[asst].amount
         );
     }
-
+         /**  
+      * 
+    @notice : "provies all bodns created for an address"
+    @param willId: Property name or address for ex. Town home located in Santa clara, 3490 Moretti lane, Milipitas,CA
+    
+    @return : returns string "Created | Started | Matured | Settled"
+    
+    */
     function getWillStatus(uint willId) public view returns (string memory) {
         if (s_willlInfo[willId].s_baseStatus == baseStatus.Created) {
             return "Created";

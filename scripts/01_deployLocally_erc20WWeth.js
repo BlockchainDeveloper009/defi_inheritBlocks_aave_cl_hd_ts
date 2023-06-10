@@ -26,7 +26,7 @@ async function main(hre) {
    await deployedVerifyContract.deployed();
 
    const currentDate = new Date();
-   content = `$ ${currentDate} | ${contractName[0]} | ${lock.address} `
+   content = `\n $ ${currentDate} | ${contractName[0]} | ${lock.address}`
    fs.appendFile('./erc20deploymentLog.txt', content, (err) => {
      if (err) {
        console.error(err);
@@ -34,18 +34,7 @@ async function main(hre) {
      }
    });
  
-   // print the address of the deployed contract
-   console.log("Verify Contract Address:", deployedVerifyContract.address);
  
-   console.log("Sleeping.....");
-   // Wait for etherscan to notice that the contract has been deployed
-   await sleep(10000);
- 
-   // Verify the contract after deploying
-   await hre.run("verify:verify", {
-     address: deployedVerifyContract.address,
-     constructorArguments: [],
-   });
 
   console.log(` 'WWethcreateWillsERC20' deployed to ${lock.address}`);
 

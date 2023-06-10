@@ -10,10 +10,17 @@
     "test:inheritance": "scripts/checks/inheritance-ordering.js artifacts/build-info/*",
     "test:generation": "scripts/checks/generation.sh",
     "gas-report": "env ENABLE_GAS_REPORT=true npm run test",
+    "generate-documentation": "solc --userdoc --devdoc ex1.sol",
     "slither": "npm run clean && slither .",
     "run-test": "npx hardhat test",
-    "run-temporary-contracts-test": "npx hardhat test .\\test\\tests_temporary-contracts\\test_Caller.test.js"
-
+    "run-tests-willSettler": "npx hardhat test .\\test\\tests_erc20WWeth\\staging\\WWethcreateWillsERC20.staging.test.js",
+    "run-temporary-contracts-test": "npx hardhat test .\\test\\tests_temporary-contracts\\test_Caller.test.js",
+    "run-loc-willsettler": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat",
+    "run_loc_createAsset_0": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"does 'ca-0' exist?\"",
+    "run_loc_createAsset_1": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"does 'ca-1' exist?\"",
+    "run_loc_createAsset_2": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"does 'ca-2' exist?\"",
+    "run_loc_createVault_0": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"create test Txns_a_createCryptoVault1\""
+    
   },
   "repository": {
     "type": "git",
@@ -41,6 +48,7 @@
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@nomiclabs/hardhat-ethers": "^2.0.0",
     "@nomiclabs/hardhat-etherscan": "^3.0.0",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
     "@typechain/ethers-v5": "^10.1.0",
     "@typechain/hardhat": "^6.1.2",
     "@types/chai": "^4.2.0",
