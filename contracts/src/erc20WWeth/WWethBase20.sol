@@ -23,6 +23,9 @@ contract WWethBase20 is WWeth20 {
     struct Property {
         uint PropertyType; //0 - crypto assets, 1  Real estate
     }
+    /**
+     * @dev this status to be assigned to Will itself.
+     */
     enum baseStatus {
         Created,
         Started,
@@ -49,6 +52,9 @@ contract WWethBase20 is WWeth20 {
         bool isAvailable;
         cryptoAssetStatus assetStatus;
     }
+    /**
+     * @dev this status to be assigned only Assets
+     */
     enum cryptoAssetStatus {
         Created,
         Assigned

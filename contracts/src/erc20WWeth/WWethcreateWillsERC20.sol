@@ -129,6 +129,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         );
         _;
     }
+        
 
     // modifier onlyNewAsset(string memory locId) {
     //     require(
@@ -138,7 +139,36 @@ contract WWethcreateWillsERC20 is WWethBase20 {
     //     );
     //     _;
     // }
+    /**
+     * 
+     * @param locId takes an assset id for eg: 'ca-0'
+     */
+    function check_position_s_arr_cryptoAssetIds  (string memory locId)
+            public returns (bool) {
+        for (uint i = 0; i < s_arr_cryptoAssetIds.length; i++) {
+            if(keccak256(abi.encodePacked(s_arr_cryptoAssetIds[i])) == 
+            keccak256(abi.encodePacked(locId)))
+            {
+                console.log("ids %s", s_arr_cryptoAssetIds[i]);
+                return true;
+            }
+        }
+        return false;
 
+    
+    }
+/**
+ * this method had a bool map to store if a position in an array is set or not
+ * Optimization: since this involved unncessary storage, removed this method as part of gas optimization
+ * @param locId : ddf
+ * @return true or false
+ */
+    function check_position_s_arr_cryptoAssetIds_expensive(string memory locId)
+    public returns (bool) {
+            // using a map to 
+        return false;
+    }
+    
     /**  
     @param assetName: Property name or address for ex. Town home located in Santa clara, 3490 Moretti lane, Milipitas,CA
     @param assetAmount: who gets the funds
@@ -150,12 +180,22 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         string memory assetName,
         uint256 assetAmount
     ) public {
-        //,
+         console.log(
+        "s_assetsCurrentId '%s' ",
+        s_assetsCurrentId
+        );
+
         string memory locId = string.concat(
             "ca-",
             Strings.toString(s_assetsCurrentId)
         );
-        s_arr_cryptoAssetIds.push(locId);
+        if(!check_position_s_arr_cryptoAssetIds(locId))
+        {
+            s_arr_cryptoAssetIds.push(locId);
+        }else{
+            revert ("Invalid Asset, may be asset already used");
+        }
+        
         cryptoAssets[locId].AssetId = locId;
         cryptoAssets[locId].Name = assetName;
         cryptoAssets[locId].amount = assetAmount;
@@ -164,12 +204,13 @@ contract WWethcreateWillsERC20 is WWethBase20 {
 
         s_assetsCurrentId++;
         console.log(
-        "assert created locId %s assetName-- %s --assetAmount-- %s tokens",
-        
+        "assert created locId %s assetName-- %s --assetAmount-- %s assetAmount -- nexts_assetsCurrentId %s --",
         locId,
         assetName,
         assetAmount
-    );
+        
+        );
+        console.log("s_assetsCurrentId = %s",s_assetsCurrentId);
         emit assetCreated(locId,assetName,assetAmount);
        
     }
@@ -260,6 +301,7 @@ contract WWethcreateWillsERC20 is WWethBase20 {
             //s_currentBondId,
             cryptoAssets[_assetId].amount
         );
+        console.log("msg sender %s", msg.sender);
         userCreatedWills[msg.sender].push(s_willlInfo[s_currentBondId]);
         uint dateHash = generateHash(willMaturityDate);
         s_WillsByMaturityDate[willMaturityDate].push(s_currentBondId);
@@ -404,6 +446,25 @@ contract WWethcreateWillsERC20 is WWethBase20 {
         if (s_willlInfo[willId].s_baseStatus == baseStatus.Settled) {
             return "Settled"; //Started, Matured, Settled
         }
+    }
+
+             /**  
+      * 
+    @notice : "status of an address"
+    @param _assetId: 'ca-0'
+    
+    @return : returns string "Created | Started | Matured | Settled"
+    
+    */
+    function getAssetStatus(string memory _assetId) public view returns (string memory) {
+        
+        if (cryptoAssets[_assetId].assetStatus == cryptoAssetStatus.Created) {
+            return "Created";
+        }
+        if (cryptoAssets[_assetId].assetStatus == cryptoAssetStatus.Assigned) {
+            return "Assigned";
+        }
+ 
     }
 
     //0x5B38Da6a701c568545dCfcB03FcB875f56beddC4

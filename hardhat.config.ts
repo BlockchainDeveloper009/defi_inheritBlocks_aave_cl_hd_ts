@@ -3,7 +3,9 @@ import { HardhatUserConfig, extendEnvironment, task} from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-web3";
 //require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config({ path: ".env" });
+//require("dotenv").config({ path: ".env" });
+
+
 
 let POLY_ALCHEMY_API_KEY_URL = process.env.POLY_ALCHEMY_API_KEY_URL;
 let GOERLI_ALCHEMY_API_KEY_URL = process.env.GOERLI_ALCHEMY_API_KEY_URL;   

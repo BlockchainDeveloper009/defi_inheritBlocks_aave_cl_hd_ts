@@ -2,6 +2,7 @@
   "name": "defi_inheritBlocks_aave_cl_hd_ts",
   "version": "1.0.0",
   "description": "",
+  "type":"commonjs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,13 +20,16 @@
     "run_loc_createAsset_0": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"does 'ca-0' exist?\"",
     "run_loc_createAsset_1": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"does 'ca-1' exist?\"",
     "run_loc_createAsset_2": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"does 'ca-2' exist?\"",
-    "run_loc_createVault_0": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"create test Txns_a_createCryptoVault1\""
+    "run_loc_createVault_0": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"create_test_a_createCryptoVault_0\"",
+    "run_loc_settle_ca_0": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"settle_ca-0\"",
+    "run_loc_check_assets": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"check_assets\"",
+    "run_loc_check_state_of_chain": "npx hardhat test .\\test\\tests_erc20WWeth\\unitTests_erc20WWeth\\localnewtork.WillCreator.test.js --network hardhat --grep \"check_state_of_chain\""
     
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BlockchainDeveloper009/defi_inheritBlocks_aave_cl_hd_ts.git"
-  },
+  }, 
   "keywords": [],
   "author": "",
   "license": "ISC",

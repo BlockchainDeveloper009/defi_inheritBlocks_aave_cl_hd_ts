@@ -4,7 +4,9 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 // const { testData } = require("./testData.js");
 
-import  testData  from "./MockData_willSettler";
+//import  testData  from "./MockData_willSettler";
+// const  testData = require("./MockData_willSettler");
+
 
 let debugMode = true;
 //https://ethereum.stackexchange.com/questions/52913/how-can-i-get-the-data-returned-from-solidity-function-from-transaction-id-in-we
@@ -64,6 +66,44 @@ describe("weth_localhost", function () {
       //console.log();
       return { lock, unlockTime, lockedAmount, owner, otherAccount };
     }
+    describe("check_state_of_chain",  function () { 
+      it("get_assetIds", async function () {
+        const { lock, owner,unlockTime } = await loadFixture(deployOneYearLockFixture);
+        // const contractAddress = deployedContractAddr;
+        // printToConsole(`contractADdr: ${contractAddress}`)
+        // const myContract = await hre.ethers.getContractAt("WWethcreateWillsERC20", contractAddress);
+        //  await lock.init();
+
+      const assstStatus_0 = await lock.getAllAsset();
+      printToConsole('assstStatus_0 ==> status')
+      printToConsole(assstStatus_0);
+
+
+      const t  = await lock.getUserCreatedBonds(owner.address);
+      printToConsole(`tampa --> '${t}'`)
+      printToConsole(t);
+
+           
+  });
+      it("check_assets", async function () {
+            const { lock, owner,unlockTime } = await loadFixture(deployOneYearLockFixture);
+            // const contractAddress = deployedContractAddr;
+            // printToConsole(`contractADdr: ${contractAddress}`)
+            // const myContract = await hre.ethers.getContractAt("WWethcreateWillsERC20", contractAddress);
+            //  await lock.init();
+
+          const assstStatus_0 = await lock.getAssetStatus('ca-0');
+          printToConsole('assstStatus_0 ==> status')
+          printToConsole(assstStatus_0);
+
+
+          const t  = await lock.getUserCreatedBonds(owner.address);
+          printToConsole(`t --> '${t}'`)
+          printToConsole(t);
+
+               
+      });
+    });
     describe("settle_assets",  function () { 
       it("settle_ca-0", async function () {
         const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
@@ -72,9 +112,19 @@ describe("weth_localhost", function () {
         // const myContract = await hre.ethers.getContractAt("WWethcreateWillsERC20", contractAddress);
 
       //  await lock.init();
-        expect(await lock.settleAssets('0'))
+
+      const willStatus_0 = await lock.getWillStatus(0);
+      printToConsole('will_0 ==> status')
+        printToConsole(willStatus_0);
+      expect(willStatus_0).to.equal('Assigned');
+
+
+
+        expect(await lock.settleAssets(0))
               .to.emit(lock, "willSettled")
-                .withArgs('0',hardhat_BenefitorAddr,'','');
+                .withArgs('0',testData.hhData.data_0.hardhat_BenefitorAddr,
+                testData.hhData.data_0.willEndDate,
+                testData.hhData.data_0.amount);
       });
     });
     describe("create_assets",  function () {
@@ -151,18 +201,27 @@ describe("weth_localhost", function () {
             let amt1 = 1 * 10 * 18;
          
 
-            const asstId = await lock.createAsset(testData.hhData.data_0.assetName, 
-              testData.hhData.data_0.amount);
-             const {tx, hash, value} = await lock.createAsset("t0", amt1);
+            
+              await expect(
+                await lock.createAsset(testData.hhData.data_0.assetName, 
+                  testData.hhData.data_0.amount)
+                
+              ).to.emit(lock, "assetCreated")
+              .withArgs(
+                testData.hhData.data_0.assetId,
+                testData.hhData.data_0.assetName,
+              testData.hhData.data_0.amount);  
 
-             printToConsole(hash);
-             console.log(value.toString());
-             printToConsole(value);
+            //  const {tx, hash, value} = await lock.createAsset("t0", amt1);
 
-            // Get the transaction receipt
-            const receipt = await ethers.provider.getTransactionReceipt(hash);
+            //  printToConsole(hash);
+            //  console.log(value.toString());
+            //  printToConsole(value);
 
-             printToConsole(receipt);
+            // // Get the transaction receipt
+            // const receipt = await ethers.provider.getTransactionReceipt(hash);
+
+            //  printToConsole(receipt);
              
             
             
@@ -177,22 +236,29 @@ describe("weth_localhost", function () {
             const { lock } = await loadFixture(deployOneYearLockFixture);
             let amt2 = 2 * 10 * 18;
             const eventName='assetCreated'
-            const {tx, hash,value} = await lock.createAsset(testData.hhData.data_1.assetName, 
+            
+            
+              await expect(
+                await lock.createAsset(testData.hhData.data_1.assetName, 
+                  testData.hhData.data_1.amount)
+                
+              ).to.emit(lock, "assetCreated")
+              .withArgs(
+                testData.hhData.data_1.assetId,
+                testData.hhData.data_1.assetName,
               testData.hhData.data_1.amount);
             
-            printToConsole(hash);
-            console.log(value.toString());
-            printToConsole(value);
-
-            // Get the transaction receipt
-            const receipt = await ethers.provider.getTransactionReceipt(hash);
-
+         
+/* code to be removed
+//             // Get the transaction receipt
+//             const receipt = await ethers.provider.getTransactionReceipt(hash);
+// console.log(receipt)
              // Find the emitted event within the transaction logs
-    const yourEvent = receipt.logs[0].event;
-printToConsole(`ourEvent --> '${yourEvent}'`)
+//     const yourEvent = receipt.logs[0].event;
+// printToConsole(`ourEvent --> '${yourEvent}'`)
     // Assert the emitted event
-    expect(yourEvent).to.equal(eventName);
-
+    // expect(yourEvent).to.equal(eventName);
+*/
         // ethers without hardhat name    
             // lock.events[eventName]((error,event) => {
             //   if(error){
@@ -218,7 +284,9 @@ printToConsole(`ourEvent --> '${yourEvent}'`)
                 testData.hhData.data_2.amount)
               
             ).to.emit(lock, "assetCreated")
-            .withArgs('ca-0','t3',amt3); // We accept any value as `when` arg
+            .withArgs(testData.hhData.data_2.assetId,
+              testData.hhData.data_2.assetName,
+              testData.hhData.data_2.amount); // We accept any value as `when` arg
             
            // expect(await lock.checkAssetisAvailable('ca-0')).to.equal(true);
           }); 
@@ -226,7 +294,7 @@ printToConsole(`ourEvent --> '${yourEvent}'`)
       
 
 
-          it("create test Txns_a_createCryptoVault1", async function () {
+          it("create_test_a_createCryptoVault_0", async function () {
             const { lock } = await loadFixture(deployOneYearLockFixture);
 
             let amt1 = 1 * 10 * 18;
@@ -245,7 +313,7 @@ printToConsole(`ourEvent --> '${yourEvent}'`)
            
           });
 
-          it("recreate a_createCryptoVault1", async function () {
+          it("recreate_test_a_createCryptoVault_0", async function () {
             
             const { lock } = await loadFixture(deployOneYearLockFixture);
             await lock.a_createCryptoVault(
@@ -256,7 +324,7 @@ printToConsole(`ourEvent --> '${yourEvent}'`)
               
             );
           }); 
-          it("a_createCryptoVault1", async function () {
+          it("a_createCryptoVault1_expectEvent", async function () {
             
             const { lock } = await loadFixture(deployOneYearLockFixture);
             await lock.a_createCryptoVault(
@@ -316,3 +384,58 @@ printToConsole(`ourEvent --> '${yourEvent}'`)
 
 });
 
+const testData = 
+{
+            "hhData" :{
+                "data_0":{
+                    
+                  "assetId":"ca-0",
+                  "assetName":"t0",
+                    "willId": 0,
+
+                    "willStartDate": 20221201,
+                    "willMaturityDate": 20221220,
+                    "amount":'200',
+                    "Benefitors": '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+
+                },
+                "data_1":{
+                    "assetId":"ca-1",
+                    "assetName":"t1",
+                    "willId": 1,
+
+                    "willStartDate": 20230101,
+                    "willMaturityDate": 20230131,
+                    "amount":'300',
+                    "Benefitors": '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+
+                }
+
+            },
+            "metamask" :{
+                "data_0":{
+                    "assetId":"ca-0",
+                    "assetName":"t0",
+                    "willId": 0,
+            
+                    "willStartDate": 20221201,
+                    "willMaturityDate": 20221220,
+                    "amount":'200',
+                    "Benefitors": '0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
+                                  
+            
+                },
+                "data_1":{
+                    "assetId":"ca-1",
+                    "assetName":"t1",
+                    "willId": 1,
+            
+                    "willStartDate": 20230101,
+                    "willMaturityDate": 20230131,
+                    "amount":'300',
+                    "Benefitors": '0xf821142CC270dAb63767cFAae15dC36D1b043348',
+            
+                }
+            
+            },
+};
